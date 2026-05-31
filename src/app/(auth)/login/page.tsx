@@ -1,16 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Button, Input, Label } from "@/components/ui";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 
-const demoAccounts = [
-  { icon: "👑", label: "Super Admin", email: "admin@smarttravel.com" },
-  { icon: "🛡️", label: "Manager", email: "manager@smarttravel.com" },
-  { icon: "👤", label: "User", email: "user@smarttravel.com" },
+const fallbackUserAccounts = [
+  { icon: "👤", label: "Demo User", email: "user@smarttravel.com", demo: true },
 ];
 
 export default function LoginPage() {
@@ -21,10 +19,24 @@ export default function LoginPage() {
   const [needsTwoFactor, setNeedsTwoFactor] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [userAccounts, setUserAccounts] = useState(fallbackUserAccounts);
 
-  const fillDemo = (mail: string) => {
-    setEmail(mail);
-    setPassword("Password123");
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth/login-users", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data?.users) && data.users.length) {
+          setUserAccounts(data.users.map((u: any) => ({ icon: "👤", label: u.name || "User", email: u.email, demo: u.email === "user@smarttravel.com" })));
+        }
+      })
+      .catch(() => null);
+    return () => { cancelled = true; };
+  }, []);
+
+  const fillUser = (account: any) => {
+    setEmail(account.email);
+    setPassword(account.demo ? "Password123" : "");
     setError("");
   };
 
@@ -115,15 +127,16 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-4">
-            <p className="mb-3 text-sm font-bold text-white">Demo accounts <span className="text-slate-400">/ password: Password123</span></p>
+            <p className="mb-3 text-sm font-bold text-white">User accounts <span className="text-slate-400">/ only regular users are shown</span></p>
             <div className="grid gap-2">
-              {demoAccounts.map((account) => (
-                <button key={account.email} type="button" onClick={() => fillDemo(account.email)} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-left text-sm transition hover:border-blue-400/40 hover:bg-blue-500/10">
+              {userAccounts.map((account) => (
+                <button key={account.email} type="button" onClick={() => fillUser(account)} className="flex flex-col gap-1 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-left text-sm transition hover:border-blue-400/40 hover:bg-blue-500/10 sm:flex-row sm:items-center sm:justify-between">
                   <span className="font-semibold text-slate-200"><span className="mr-2">{account.icon}</span>{account.label}</span>
-                  <span className="text-slate-400">{account.email}</span>
+                  <span className="break-all text-slate-400">{account.email}</span>
                 </button>
               ))}
             </div>
+            <p className="mt-3 text-xs text-slate-500">Newly registered users will appear here after refresh. Admin and manager accounts are hidden.</p>
           </div>
         </div>
 

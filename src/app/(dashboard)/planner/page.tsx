@@ -188,6 +188,16 @@ export default function PlannerPage() {
   const [draftAirlineFilter, setDraftAirlineFilter] = useState("ALL");
   const [draftDepartureTimeFilter, setDraftDepartureTimeFilter] = useState("ANY");
 
+
+  useEffect(() => {
+    fetch("/api/admin/flight-provider", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.provider) setForm((prev) => ({ ...prev, flightProvider: data.provider }));
+      })
+      .catch(() => null);
+  }, []);
+
   useEffect(() => {
     if (!result) {
       setSelectedFlightId("");
@@ -787,9 +797,6 @@ export default function PlannerPage() {
         )}
       </Card>
 
-      {!result && !generating && (
-        <Card><CardContent className="p-10 text-center"><Sparkles className="h-10 w-10 text-primary mx-auto mb-3" /><h3 className="font-semibold text-lg">Ready to generate</h3></CardContent></Card>
-      )}
       {generating && (
         <Card><CardContent className="p-12 text-center"><Loader2 className="h-9 w-9 animate-spin text-primary mx-auto mb-3" /><h3 className="font-semibold">{"Calling live APIs and building AI plan..."}</h3></CardContent></Card>
       )}

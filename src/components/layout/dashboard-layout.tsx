@@ -283,7 +283,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <Link href={isAnyManager ? "/admin/activity#messages" : "/activity"} className="relative p-2 rounded-2xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" aria-label="Messages">
               <MessageSquare className="h-5 w-5" />
               {headerCounts.messages > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-[18px] text-center border-2 border-card">
+                <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-black leading-none text-white shadow-lg shadow-red-500/30 ring-2 ring-background">
                   {headerCounts.messages > 9 ? "9+" : headerCounts.messages}
                 </span>
               )}
@@ -291,7 +291,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <Link href={isAnyManager ? "/admin/notifications" : "/notifications"} className="relative p-2 rounded-2xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" aria-label="Notifications">
               <Bell className="h-5 w-5" />
               {headerCounts.notifications > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-[18px] text-center border-2 border-card">
+                <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-black leading-none text-white shadow-lg shadow-red-500/30 ring-2 ring-background">
                   {headerCounts.notifications > 9 ? "9+" : headerCounts.notifications}
                 </span>
               )}

@@ -53,7 +53,7 @@ export function generateId(): string {
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
     DRAFT: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    PLANNED: 'border-green-500/40 bg-green-100 text-green-800 dark:bg-green-600/20 dark:text-green-300 dark:border-green-500/50',
+    PLANNED: 'border-emerald-400/60 bg-emerald-950 text-emerald-100 dark:border-emerald-400/60 dark:bg-emerald-500/20 dark:text-emerald-100',
     ACTIVE: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
     COMPLETED: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
     ARCHIVED: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',

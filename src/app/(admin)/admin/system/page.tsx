@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from "@/components/ui";
-import { Activity, Database, ShieldCheck, Server, Clock, RefreshCw, Plane, Hotel, MapPin, Bell } from "lucide-react";
+import { Activity, Database, ShieldCheck, Server, Clock, RefreshCw, Plane, Hotel, MapPin, Bell, CheckCircle2 } from "lucide-react";
 
 type HealthData = {
   status: "ok" | "error";
@@ -25,6 +25,8 @@ export default function AdminSystemPage() {
   const [health, setHealth] = useState<HealthData | null>(null);
   const [healthError, setHealthError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [flightProvider, setFlightProvider] = useState("AUTO");
+  const [savingProvider, setSavingProvider] = useState(false);
 
   const loadHealth = async () => {
     setLoading(true);
@@ -42,8 +44,41 @@ export default function AdminSystemPage() {
     }
   };
 
+
+  const flightProviders = [
+    { value: "AUTO", title: "Auto", desc: "SerpApi #3 → #2 → #1 → SearchApi → Duffel" },
+    { value: "SERPAPI_3", title: "SerpApi #3", desc: "Newest SerpApi Google Flights key" },
+    { value: "SERPAPI_2", title: "SerpApi #2", desc: "Backup SerpApi key" },
+    { value: "SERPAPI_1", title: "SerpApi #1", desc: "Original SerpApi key" },
+    { value: "SEARCHAPI", title: "SearchApi", desc: "Google Flights through SearchAPI" },
+    { value: "DUFFEL", title: "Duffel Sandbox", desc: "Sandbox offers only; no real booking" },
+  ];
+
+  const loadFlightProvider = async () => {
+    const res = await fetch("/api/admin/flight-provider", { cache: "no-store" });
+    const data = await res.json().catch(() => ({}));
+    if (data?.provider) setFlightProvider(data.provider);
+  };
+
+  const saveFlightProvider = async (provider: string) => {
+    setSavingProvider(true);
+    try {
+      const res = await fetch("/api/admin/flight-provider", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Could not save provider");
+      setFlightProvider(data.provider);
+    } finally {
+      setSavingProvider(false);
+    }
+  };
+
   useEffect(() => {
     loadHealth();
+    loadFlightProvider();
     const timer = window.setInterval(loadHealth, 30000);
     return () => window.clearInterval(timer);
   }, []);
@@ -71,8 +106,42 @@ export default function AdminSystemPage() {
       <div className="grid md:grid-cols-3 gap-4">
         <Card><CardContent className="p-5"><ShieldCheck className="h-6 w-6 text-green-500 mb-3" /><h3 className="font-semibold">Presentation Safe</h3><p className="text-sm text-muted-foreground mt-1">The admin UI shows only safe live status information for the presentation build.</p><Badge variant="success" className="mt-3">Locked</Badge></CardContent></Card>
         <Card><CardContent className="p-5"><Database className="h-6 w-6 text-primary mb-3" /><h3 className="font-semibold">Database</h3><p className="text-sm text-muted-foreground mt-1">Local Prisma database is used for demo users, trips, bookings and activity.</p><Badge className="mt-3">Prisma</Badge></CardContent></Card>
-        <Card><CardContent className="p-5"><Server className="h-6 w-6 text-primary mb-3" /><h3 className="font-semibold">Runtime</h3><p className="text-sm text-muted-foreground mt-1">AI stays local. SmartTravel redirects users to real provider pages instead of selling tickets.</p><Badge className="mt-3">Local AI</Badge></CardContent></Card>
+        <Card><CardContent className="p-5"><Server className="h-6 w-6 text-primary mb-3" /><h3 className="font-semibold">Runtime</h3><p className="text-sm text-muted-foreground mt-1">SmartTravel shows real provider options and redirects users to external booking pages. It does not sell tickets.</p><Badge className="mt-3">Local AI</Badge></CardContent></Card>
       </div>
+
+
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base"><Plane className="h-4 w-4 text-primary" /> Flight API Provider</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">Choose the default flight provider used by regular users in the planner. Managers and super admins can still see the provider setting here.</p>
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {flightProviders.map((provider) => {
+              const active = flightProvider === provider.value;
+              return (
+                <button
+                  key={provider.value}
+                  type="button"
+                  disabled={savingProvider}
+                  onClick={() => saveFlightProvider(provider.value)}
+                  className={`rounded-2xl border p-4 text-left transition-colors ${active ? "border-primary bg-primary/10" : "bg-card hover:bg-muted/40"}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold">{provider.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{provider.desc}</p>
+                    </div>
+                    {active ? <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" /> : null}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <Badge variant="outline">Current provider: {flightProvider}</Badge>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

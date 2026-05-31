@@ -83,7 +83,7 @@ export default function RegisterPage() {
             {error && <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-200">{error}</div>}
             <div>
               <Label className="text-sm font-bold text-slate-200">Full Name</Label>
-              <Input placeholder="" value={form.name} onChange={set("name")} className="auth-input mt-2 h-14 rounded-2xl border-white/10 bg-black/25 text-base text-white placeholder:text-slate-500" />
+              <Input placeholder="Aylin Demir" value={form.name} onChange={set("name")} className="auth-input mt-2 h-14 rounded-2xl border-white/10 bg-black/25 text-base text-white placeholder:text-slate-500" />
             </div>
             <div>
               <Label className="text-sm font-bold text-slate-200">Email</Label>

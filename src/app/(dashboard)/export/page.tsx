@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Label, Select, EmptyState } from "@/components/ui";
-import { FileText, Download, Loader2, Table } from "lucide-react";
+import { Download } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function ExportPage() {
@@ -26,6 +26,7 @@ export default function ExportPage() {
     if (!inputTripId) { toast.error("Select a trip first"); return; }
     setLoading(true);
 
+    try {
     if (format === "csv") {
       const res = await fetch(`/api/export?tripId=${inputTripId}&format=csv`);
       if (!res.ok) {
@@ -63,12 +64,17 @@ export default function ExportPage() {
       // Generate PDF client-side
       await generatePDF(data);
     }
-    setLoading(false);
+    } catch (err: any) {
+      console.error("Export failed", err);
+      toast.error(err?.message || "Export failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const generatePDF = async (data: any) => {
     const { jsPDF } = await import("jspdf");
-    await import("jspdf-autotable");
+    const autoTableModule = await import("jspdf-autotable");
 
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageW = doc.internal.pageSize.getWidth();
@@ -116,7 +122,12 @@ export default function ExportPage() {
       doc.text(lines, margin + indent, y);
       y += Math.max(5, lines.length * 5) + 1;
     };
-    const autoTable = (doc as any).autoTable;
+    const autoTableExport = (autoTableModule as any).default || (autoTableModule as any).autoTable || (doc as any).autoTable;
+    const runTable = (options: any) => {
+      if (typeof (doc as any).autoTable === "function") return (doc as any).autoTable(options);
+      if (typeof autoTableExport === "function") return autoTableExport(doc, options);
+      throw new Error("PDF table engine could not load.");
+    };
 
     drawHeader(true);
     y = 43;
@@ -134,7 +145,7 @@ export default function ExportPage() {
       ["Travelers / Style", `${safe(data.trip.travelers)} traveler(s) | ${safe(data.trip.style)}`],
       ["Status", safe(data.trip.status || "Planned")],
     ];
-    autoTable.call(doc, {
+    runTable({
       startY: y,
       head: [["Trip Overview", ""]],
       body: overviewRows,
@@ -165,7 +176,7 @@ export default function ExportPage() {
       const rows = (day.items || []).length
         ? day.items.map((i: any) => [safe(i.time || ""), safe(i.title), safe(i.cost || ""), safe(i.status || "")])
         : [["", "No itinerary items saved for this day.", "", ""]];
-      autoTable.call(doc, {
+      runTable({
         startY: y,
         head: [["Time", "Activity", "Cost", "Status"]],
         body: rows,
@@ -179,7 +190,7 @@ export default function ExportPage() {
     }
 
     section("Budget Breakdown");
-    autoTable.call(doc, {
+    runTable({
       startY: y,
       head: [["Category", "Planned", "Spent"]],
       body: (data.budget || []).map((c: any) => [safe(c.category), safe(c.planned), safe(c.spent)]),
@@ -192,7 +203,7 @@ export default function ExportPage() {
     y = (doc as any).lastAutoTable.finalY + 8;
 
     section("Bookings / External Options");
-    autoTable.call(doc, {
+    runTable({
       startY: y,
       head: [["Type", "Provider", "Status", "Reference"]],
       body: (data.bookings || []).map((b: any) => [safe(b.type || "-"), safe(b.provider), safe(b.status), safe(b.ref)]),
@@ -206,7 +217,7 @@ export default function ExportPage() {
 
     if (data.collaborators?.length > 0) {
       section("Collaborators");
-      autoTable.call(doc, {
+      runTable({
         startY: y,
         head: [["Name", "Email", "Role"]],
         body: data.collaborators.map((c: any) => [safe(c.name), safe(c.email), safe(c.role)]),
@@ -261,19 +272,7 @@ export default function ExportPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="p-4">
-          <h3 className="font-medium text-sm mb-2">What&apos;s included in exports:</h3>
-          <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2"><FileText className="h-4 w-4" /> Trip overview</div>
-            <div className="flex items-center gap-2"><FileText className="h-4 w-4" /> Day-by-day itinerary</div>
-            <div className="flex items-center gap-2"><FileText className="h-4 w-4" /> Budget breakdown</div>
-            <div className="flex items-center gap-2"><FileText className="h-4 w-4" /> Bookings list</div>
-            <div className="flex items-center gap-2"><FileText className="h-4 w-4" /> Collaborator info</div>
-            <div className="flex items-center gap-2"><Table className="h-4 w-4" /> Expense log (CSV)</div>
-          </div>
-        </CardContent>
-      </Card>
+
     </div>
   );
 }
