@@ -1,0 +1,326 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Local-first demo: no remote Google Fonts import. Uses system font stack from Tailwind/theme. */
+
+@layer base {
+  :root {
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-display: 'Playfair Display', Georgia, serif;
+
+    --background: 170 22% 94%;
+    --foreground: 210 35% 12%;
+    --card: 165 24% 97%;
+    --card-foreground: 210 35% 12%;
+    --popover: 165 24% 98%;
+    --popover-foreground: 210 35% 12%;
+    --primary: 181 25% 42%;
+    --primary-foreground: 180 32% 98%;
+    --secondary: 170 18% 88%;
+    --secondary-foreground: 210 35% 12%;
+    --muted: 170 18% 88%;
+    --muted-foreground: 203 15% 38%;
+    --accent: 181 23% 84%;
+    --accent-foreground: 210 35% 12%;
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 177 18% 78%;
+    --input: 177 18% 78%;
+    --ring: 181 25% 42%;
+    --radius: 0.625rem;
+    --sidebar: 170 25% 90%;
+    --sidebar-foreground: 210 35% 14%;
+    --sidebar-accent: 181 22% 82%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 6%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 76% 48%;
+    --sidebar: 222 47% 4%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-accent: 217 33% 12%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl;
+  }
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  }
+}
+
+/* Leaflet overrides */
+.leaflet-container { z-index: 1; border-radius: var(--radius); }
+
+
+/* Final local demo responsive polish */
+@layer base {
+  html, body {
+    min-height: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior-y: auto; /* keep normal mobile pull-to-refresh */
+  }
+
+  #__next, main {
+    min-width: 0;
+  }
+
+  input, select, textarea, button {
+    font-size: 16px; /* prevents iOS auto zoom on forms */
+  }
+
+  @media (min-width: 640px) {
+    input, select, textarea, button { font-size: inherit; }
+  }
+}
+
+@layer utilities {
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-top { padding-top: env(safe-area-inset-top); }
+
+  @media (max-width: 640px) {
+    .mobile-card-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    .responsive-table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+    }
+  }
+}
+
+
+/* FINAL mobile no-zoom/no-horizontal-overflow polish */
+@layer utilities {
+  .mobile-full-width { width: 100%; max-width: 100%; min-width: 0; }
+
+  @media (max-width: 640px) {
+    .mobile-stack {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .mobile-actions {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mobile-actions > * { width: 100%; }
+
+    .mobile-page-pad {
+      padding-left: 0.875rem !important;
+      padding-right: 0.875rem !important;
+    }
+  }
+}
+
+/* FINAL mobile polish */
+@media (max-width: 640px) {
+  html, body { max-width: 100%; overflow-x: hidden; }
+  input, select, textarea, button { font-size: 16px; }
+  .mobile-dialog input[type="date"] { color-scheme: light; min-width: 0; }
+  .mobile-date-grid { grid-template-columns: 1fr !important; }
+  .mobile-actions-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  .mobile-actions-grid button { width: 100%; min-width: 0; }
+  .mobile-trip-meta { display: grid !important; grid-template-columns: 1fr 1fr; gap: 0.75rem !important; }
+  .mobile-trip-meta > span { align-items: flex-start; min-width: 0; word-break: break-word; }
+  .mobile-trip-meta svg { margin-top: 0.15rem; flex-shrink: 0; }
+  .mobile-landing-nav { height: auto !important; min-height: 4.5rem; padding-top: .75rem; padding-bottom: .75rem; align-items: center; }
+  .mobile-landing-brand-subtitle { display: none !important; }
+  .mobile-landing-actions a { padding-left: .85rem !important; padding-right: .85rem !important; font-size: .85rem !important; }
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+input[type="date"] { color-scheme: light; }
+.dark input[type="date"] { color-scheme: dark; }
+
+
+/* Premium presentation visual refresh */
+@layer base {
+  .dark {
+    --background: 224 48% 5%;
+    --foreground: 214 40% 96%;
+    --card: 222 46% 8%;
+    --card-foreground: 214 40% 96%;
+    --popover: 222 46% 8%;
+    --popover-foreground: 214 40% 96%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 6%;
+    --secondary: 220 33% 13%;
+    --secondary-foreground: 214 40% 96%;
+    --muted: 220 33% 13%;
+    --muted-foreground: 216 22% 70%;
+    --accent: 217 44% 18%;
+    --accent-foreground: 214 40% 96%;
+    --border: 220 32% 16%;
+    --input: 220 32% 16%;
+    --ring: 217 91% 60%;
+    --sidebar: 225 55% 4%;
+    --sidebar-foreground: 214 40% 95%;
+    --sidebar-accent: 220 42% 15%;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 12% 0%, rgba(128, 171, 171, 0.20), transparent 34rem),
+      radial-gradient(circle at 95% 12%, rgba(219, 231, 227, 0.55), transparent 30rem),
+      hsl(var(--background));
+  }
+
+  .dark body {
+    background:
+      radial-gradient(circle at 12% 0%, rgba(59, 130, 246, 0.12), transparent 32rem),
+      radial-gradient(circle at 95% 12%, rgba(14, 165, 233, 0.08), transparent 30rem),
+      hsl(var(--background));
+  }
+}
+
+@layer components {
+  .auth-shell {
+    position: relative;
+    background: #05070d;
+  }
+
+  .auth-bg {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 22% 20%, rgba(59, 130, 246, .18), transparent 34rem),
+      radial-gradient(circle at 86% 8%, rgba(255, 255, 255, .08), transparent 24rem),
+      linear-gradient(180deg, rgba(255,255,255,.04), transparent 20%, rgba(0,0,0,.38));
+  }
+  .auth-bg::before,
+  .auth-bg::after {
+    content: "";
+    position: absolute;
+    border-radius: 9999px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.035);
+    filter: blur(.2px);
+  }
+  .auth-bg::before {
+    width: 42rem;
+    height: 42rem;
+    left: -20rem;
+    bottom: -19rem;
+    box-shadow: 0 0 90px rgba(59,130,246,.08);
+  }
+  .auth-bg::after {
+    width: 34rem;
+    height: 34rem;
+    right: -14rem;
+    top: -13rem;
+    box-shadow: 0 0 90px rgba(255,255,255,.08);
+  }
+  .auth-title {
+    font-family: var(--font-display);
+    text-shadow: 0 18px 55px rgba(0,0,0,.45);
+  }
+  .auth-card {
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 30px 90px rgba(0,0,0,.45);
+  }
+  .auth-input {
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .auth-input:focus {
+    border-color: rgba(96,165,250,.6) !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.18), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+}
+
+@layer utilities {
+  .premium-panel {
+    @apply rounded-3xl border border-white/10 bg-white/[0.045] shadow-2xl shadow-black/30 backdrop-blur-xl;
+  }
+  .premium-card {
+    @apply rounded-2xl border border-border/80 bg-card/90 shadow-lg shadow-black/20;
+  }
+  .active-glow {
+    @apply ring-1 ring-blue-400/40 shadow-lg shadow-blue-950/40;
+  }
+}
+
+/* SmartTravel presentation polish: keep dashboard readable on phones/tablets. */
+@media (max-width: 768px) {
+  .max-w-7xl { max-width: 100% !important; }
+  main, .container { overflow-x: hidden; }
+  table { min-width: 640px; }
+  .grid { min-width: 0; }
+  .rounded-2xl, .rounded-xl { max-width: 100%; }
+  button, a, input, select, textarea { min-width: 0; }
+}
+
+@media (max-width: 640px) {
+  h1 { font-size: 1.65rem !important; line-height: 2rem !important; }
+  h2 { font-size: 1.35rem !important; }
+  .text-3xl { font-size: 1.65rem !important; line-height: 2rem !important; }
+  .text-2xl { font-size: 1.35rem !important; line-height: 1.75rem !important; }
+  .p-6 { padding: 1rem !important; }
+  .p-5 { padding: 0.9rem !important; }
+  .gap-6 { gap: 1rem !important; }
+  .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem !important; }
+}
+
+
+/* Light mode readability fix: soft off-white, not pure white; all dashboard text remains readable. */
+@layer components {
+  .premium-card {
+    @apply rounded-2xl border border-border/80 bg-card/95 shadow-md shadow-slate-900/5;
+  }
+  .dark .premium-card {
+    @apply bg-card/90 shadow-black/20;
+  }
+  .active-glow {
+    @apply ring-1 ring-primary/35 shadow-md shadow-primary/10;
+  }
+  .dark .active-glow {
+    @apply ring-blue-400/40 shadow-lg shadow-blue-950/40;
+  }
+}

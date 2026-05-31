@@ -1,0 +1,431 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  image         String?
+  role          String    @default("USER")
+  sessionDays   Int       @default(30)
+  isActive      Boolean   @default(true)
+  twoFactorEnabled Boolean @default(false)
+  twoFactorCode    String?
+  twoFactorExpiresAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  preference    UserPreference?
+  trips         Trip[]
+  collaborations Collaborator[]
+  expenses      Expense[]
+  comments      Comment[]
+  votes         Vote[]
+  bookings      Booking[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  adminActions  AdminActionLog[]
+  managerActions ManagerActionLog[] @relation("ManagerLogs")
+  sentInvites   Collaborator[]  @relation("InvitedBy")
+  passwordResetTokens PasswordResetToken[]
+  verificationTokens  EmailVerificationToken[]
+  reviews             Review[]
+  favoriteDestinations FavoriteDestination[]
+  uploadedFiles       UploadedFile[]
+  contentReports      ContentReport[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserPreference {
+  id                    String  @id @default(cuid())
+  userId                String  @unique
+  interests             String  @default("[]")
+  travelStyle           String  @default("MODERATE")
+  budgetStyle           String  @default("mid-range")
+  preferredTransport    String  @default("[\"public_transit\"]")
+  travelPace            String  @default("MODERATE")
+  accommodationType     String  @default("HOTEL")
+  dietaryRestrictions   String  @default("[]")
+  accessibilityNeeds    String  @default("[]")
+  notificationsEnabled  Boolean @default(true)
+  emailNotifications    Boolean @default(true)
+  tripReminders         Boolean @default(true)
+  budgetAlerts          Boolean @default(true)
+  collaborationUpdates  Boolean @default(true)
+  quietMode             Boolean @default(false)
+  language              String  @default("en")
+  dateFormat            String  @default("MM/DD/YYYY")
+  defaultCurrency       String  @default("USD")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Trip {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  startDate     DateTime
+  endDate       DateTime
+  status        String   @default("DRAFT")
+  totalBudget   Float    @default(0)
+  currency      String   @default("USD")
+  travelerCount Int      @default(1)
+  notes         String?
+  travelStyle   String   @default("MODERATE")
+  isPublic      Boolean  @default(false)
+  coverImage    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destinations  TripDestination[]
+  itinerary     Itinerary?
+  expenses      Expense[]
+  budgetCategories BudgetCategory[]
+  collaborators Collaborator[]
+  bookings      Booking[]
+  comments      Comment[]
+  auditLogs     AuditLog[]
+}
+
+model TripDestination {
+  id          String    @id @default(cuid())
+  tripId      String
+  name        String
+  country     String
+  latitude    Float
+  longitude   Float
+  orderIndex  Int       @default(0)
+  arrivalDate DateTime?
+  departDate  DateTime?
+  trip        Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model Itinerary {
+  id          String         @id @default(cuid())
+  tripId      String         @unique
+  generatedBy String         @default("local")
+  version     Int            @default(1)
+  isAccepted  Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  trip        Trip           @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  days        ItineraryDay[]
+}
+
+model ItineraryDay {
+  id          String          @id @default(cuid())
+  itineraryId String
+  dayNumber   Int
+  date        DateTime
+  title       String?
+  notes       String?
+  dailyCost   Float           @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  itinerary   Itinerary       @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  items       ItineraryItem[]
+  @@unique([itineraryId, dayNumber])
+}
+
+model ItineraryItem {
+  id            String   @id @default(cuid())
+  dayId         String
+  title         String
+  description   String?
+  location      String?
+  latitude      Float?
+  longitude     Float?
+  timeSlot      String   @default("MORNING")
+  startTime     String?
+  endTime       String?
+  estimatedCost Float    @default(0)
+  currency      String   @default("USD")
+  category      String   @default("activity")
+  tags          String   @default("[]")
+  notes         String?
+  imageUrl      String?
+  status        String   @default("PLANNED")
+  orderIndex    Int      @default(0)
+  crowdLevel    String?
+  weatherNote   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  day           ItineraryDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
+  votes         Vote[]
+  comments      Comment[]
+}
+
+model BudgetCategory {
+  id          String   @id @default(cuid())
+  tripId      String
+  category    String
+  planned     Float    @default(0)
+  spent       Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  @@unique([tripId, category])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  tripId      String
+  userId      String
+  amount      Float
+  currency    String   @default("USD")
+  category    String
+  description String
+  date        DateTime @default(now())
+  notes       String?
+  receiptUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Collaborator {
+  id          String   @id @default(cuid())
+  tripId      String
+  userId      String
+  role        String   @default("VIEWER")
+  status      String   @default("PENDING")
+  invitedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy   User?    @relation("InvitedBy", fields: [invitedById], references: [id])
+  @@unique([tripId, userId])
+}
+
+model Comment {
+  id              String   @id @default(cuid())
+  content         String
+  userId          String
+  tripId          String?
+  itineraryItemId String?
+  parentId        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trip            Trip?    @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  itineraryItem   ItineraryItem? @relation(fields: [itineraryItemId], references: [id], onDelete: Cascade)
+  parent          Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies         Comment[] @relation("CommentReplies")
+}
+
+model Vote {
+  id              String   @id @default(cuid())
+  userId          String
+  itineraryItemId String
+  value           Int      @default(1)
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itineraryItem   ItineraryItem @relation(fields: [itineraryItemId], references: [id], onDelete: Cascade)
+  @@unique([userId, itineraryItemId])
+}
+
+model Booking {
+  id              String   @id @default(cuid())
+  tripId          String
+  userId          String
+  type            String
+  provider        String
+  bookingRef      String?
+  url             String?
+  status          String   @default("PENDING")
+  checkIn         DateTime?
+  checkOut        DateTime?
+  amount          Float?
+  currency        String   @default("USD")
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  trip            Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  link      String?
+  isRead    Boolean  @default(false)
+  metadata  String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  tripId    String?
+  action    String
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+  trip      Trip?    @relation(fields: [tripId], references: [id])
+}
+
+model AdminActionLog {
+  id          String   @id @default(cuid())
+  adminId     String
+  action      String
+  targetType  String?
+  targetId    String?
+  details     String?
+  actorRole   String   @default("SUPER_ADMIN")
+  createdAt   DateTime @default(now())
+  admin       User     @relation(fields: [adminId], references: [id])
+}
+
+model ManagerActionLog {
+  id          String   @id @default(cuid())
+  managerId   String
+  action      String
+  targetType  String?
+  targetId    String?
+  details     String?
+  createdAt   DateTime @default(now())
+  manager     User     @relation("ManagerLogs", fields: [managerId], references: [id])
+}
+
+model DestinationCatalog {
+  id                String   @id @default(cuid())
+  name              String
+  city              String
+  country           String
+  description       String
+  category          String
+  latitude          Float
+  longitude         Float
+  rating            Float    @default(4.0)
+  priceLevel        Int      @default(2)
+  imageUrl          String?
+  tags              String   @default("[]")
+  openingHours      String?
+  estimatedDuration String?
+  estimatedCost     Float?   @default(0)
+  currency          String   @default("USD")
+  isFeatured        Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  reviews           Review[]
+  favoritedBy       FavoriteDestination[]
+}
+
+
+
+
+model Review {
+  id                  String             @id @default(cuid())
+  userId              String
+  destinationCatalogId String?
+  tripId              String?
+  rating              Int                // 1-5
+  title               String?
+  content             String?
+  isPublic            Boolean            @default(true)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination         DestinationCatalog? @relation(fields: [destinationCatalogId], references: [id])
+}
+
+model FavoriteDestination {
+  id                   String             @id @default(cuid())
+  userId               String
+  destinationCatalogId String
+  createdAt            DateTime           @default(now())
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination          DestinationCatalog @relation(fields: [destinationCatalogId], references: [id], onDelete: Cascade)
+  @@unique([userId, destinationCatalogId])
+}
+
+model UploadedFile {
+  id          String   @id @default(cuid())
+  userId      String
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  url         String
+  purpose     String   @default("general") // profile | receipt | cover
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ContentReport {
+  id           String   @id @default(cuid())
+  reporterId   String
+  targetType   String   // REVIEW | COMMENT | TRIP
+  targetId     String
+  reason       String   // SPAM | INAPPROPRIATE | OFFENSIVE | OTHER
+  details      String?
+  status       String   @default("PENDING") // PENDING | RESOLVED | DISMISSED
+  resolvedAt   DateTime?
+  resolvedBy   String?
+  createdAt    DateTime @default(now())
+  reporter     User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+}
