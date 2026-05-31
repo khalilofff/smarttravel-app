@@ -11,6 +11,8 @@ const fallbackUserAccounts = [
   { icon: "👤", label: "Demo User", email: "user@smarttravel.com", demo: true },
 ];
 
+const LOCAL_LOGIN_USERS_KEY = "smarttravel-local-login-users";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,16 +24,21 @@ export default function LoginPage() {
   const [userAccounts, setUserAccounts] = useState(fallbackUserAccounts);
 
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/auth/login-users", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!cancelled && Array.isArray(data?.users) && data.users.length) {
-          setUserAccounts(data.users.map((u: any) => ({ icon: "👤", label: u.name || "User", email: u.email, demo: u.email === "user@smarttravel.com" })));
-        }
-      })
-      .catch(() => null);
-    return () => { cancelled = true; };
+    try {
+      const raw = window.localStorage.getItem(LOCAL_LOGIN_USERS_KEY);
+      const localUsers = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(localUsers) && localUsers.length) {
+        const cleaned = localUsers
+          .filter((u: any) => u?.email && !["admin@smarttravel.com", "manager@smarttravel.com"].includes(String(u.email).toLowerCase()))
+          .slice(0, 3)
+          .map((u: any) => ({ icon: "👤", label: u.name || "User", email: u.email, demo: false }));
+        setUserAccounts([...cleaned, ...fallbackUserAccounts]);
+      } else {
+        setUserAccounts(fallbackUserAccounts);
+      }
+    } catch {
+      setUserAccounts(fallbackUserAccounts);
+    }
   }, []);
 
   const fillUser = (account: any) => {
@@ -127,7 +134,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-4">
-            <p className="mb-3 text-sm font-bold text-white">User accounts <span className="text-slate-400">/ only regular users are shown</span></p>
+            <p className="mb-3 text-sm font-bold text-white">Quick sign in</p>
             <div className="grid gap-2">
               {userAccounts.map((account) => (
                 <button key={account.email} type="button" onClick={() => fillUser(account)} className="flex flex-col gap-1 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-left text-sm transition hover:border-blue-400/40 hover:bg-blue-500/10 sm:flex-row sm:items-center sm:justify-between">
@@ -136,7 +143,7 @@ export default function LoginPage() {
                 </button>
               ))}
             </div>
-            <p className="mt-3 text-xs text-slate-500">Newly registered users will appear here after refresh. Admin and manager accounts are hidden.</p>
+            <p className="mt-3 text-xs text-slate-500">Only this browser’s saved account shortcut is shown. Other users are hidden.</p>
           </div>
         </div>
 

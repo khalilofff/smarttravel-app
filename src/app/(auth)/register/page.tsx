@@ -5,6 +5,24 @@ import Link from "next/link";
 import { Button, Input, Label } from "@/components/ui";
 import { Eye, EyeOff, CheckCircle2, ArrowRight } from "lucide-react";
 
+const LOCAL_LOGIN_USERS_KEY = "smarttravel-local-login-users";
+
+function saveLocalLoginUser(user: { name: string; email: string }) {
+  try {
+    const raw = window.localStorage.getItem(LOCAL_LOGIN_USERS_KEY);
+    const existing = raw ? JSON.parse(raw) : [];
+    const users = Array.isArray(existing) ? existing : [];
+    const email = user.email.toLowerCase().trim();
+    const next = [
+      { name: user.name.trim() || "User", email },
+      ...users.filter((x: any) => String(x?.email || "").toLowerCase() !== email),
+    ].slice(0, 3);
+    window.localStorage.setItem(LOCAL_LOGIN_USERS_KEY, JSON.stringify(next));
+  } catch {
+    // Ignore local shortcut errors. Account creation still succeeds.
+  }
+}
+
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [showPw, setShowPw] = useState(false);
@@ -32,6 +50,7 @@ export default function RegisterPage() {
         setLoading(false);
         return;
       }
+      saveLocalLoginUser({ name: form.name, email: form.email });
       setDone(true);
     } catch {
       setError("Something went wrong.");
