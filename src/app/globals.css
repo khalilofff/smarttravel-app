@@ -174,17 +174,6 @@
   .mobile-landing-nav { height: auto !important; min-height: 4.5rem; padding-top: .75rem; padding-bottom: .75rem; align-items: center; }
   .mobile-landing-brand-subtitle { display: none !important; }
   .mobile-landing-actions a { padding-left: .85rem !important; padding-right: .85rem !important; font-size: .85rem !important; }
-
-  .mobile-wrap,
-  .mobile-wrap * {
-    min-width: 0;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-  }
-
-  .card-hover {
-    transform: none !important;
-  }
 }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -298,25 +287,61 @@ input[type="date"] { color-scheme: light; }
   }
 }
 
-/* SmartTravel presentation polish: keep dashboard readable on phones/tablets. */
-@media (max-width: 768px) {
-  .max-w-7xl { max-width: 100% !important; }
-  main, .container { overflow-x: hidden; }
-  table { min-width: 640px; }
-  .grid { min-width: 0; }
-  .rounded-2xl, .rounded-xl { max-width: 100%; }
-  button, a, input, select, textarea { min-width: 0; }
+/* SmartTravel presentation polish: scoped fixes only. Do not shrink dashboard pages globally. */
+.smart-date-input {
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--background)) !important;
+  color-scheme: dark;
+}
+.smart-date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.85;
 }
 
-@media (max-width: 640px) {
-  h1 { font-size: 1.65rem !important; line-height: 2rem !important; }
-  h2 { font-size: 1.35rem !important; }
-  .text-3xl { font-size: 1.65rem !important; line-height: 2rem !important; }
-  .text-2xl { font-size: 1.35rem !important; line-height: 1.75rem !important; }
-  .p-6 { padding: 1rem !important; }
-  .p-5 { padding: 0.9rem !important; }
-  .gap-6 { gap: 1rem !important; }
-  .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem !important; }
+@media (max-width: 768px) {
+  main:not(.landing-page), .container { overflow-x: hidden; }
+  table { min-width: 640px; }
+  button, a, input, select, textarea { min-width: 0; }
+
+  .landing-page,
+  .landing-page * {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .landing-header {
+    align-items: center;
+  }
+
+  .landing-brand-subtitle {
+    display: none !important;
+  }
+
+  .landing-actions a {
+    white-space: nowrap;
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .landing-header {
+    gap: 0.75rem;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .landing-brand {
+    max-width: 44%;
+  }
+  .landing-actions {
+    gap: 0.35rem;
+  }
+  .landing-actions a {
+    border-radius: 0.9rem !important;
+    padding-left: 0.65rem !important;
+    padding-right: 0.65rem !important;
+  }
 }
 
 
