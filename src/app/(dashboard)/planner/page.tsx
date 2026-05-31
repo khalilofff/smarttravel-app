@@ -670,7 +670,7 @@ export default function PlannerPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2"><Sparkles className="h-7 w-7 text-primary" /> AI Trip Planner</h1>
-        <p className="text-muted-foreground mt-2 max-w-3xl">Generate a complete AI-planned trip using live APIs. Flights use SerpApi #3/#2/#1 or SearchApi when quota is available; Auto mode can also use Duffel sandbox test offers. Demo flight fallback is disabled.</p>
+        
       </div>
 
       <Card className="overflow-hidden">
@@ -788,30 +788,30 @@ export default function PlannerPage() {
       </Card>
 
       {!result && !generating && (
-        <Card><CardContent className="p-10 text-center"><Sparkles className="h-10 w-10 text-primary mx-auto mb-3" /><h3 className="font-semibold text-lg">Ready to generate</h3><p className="text-sm text-muted-foreground max-w-xl mx-auto mt-2">Use the real API flow. User/trip records are local; hotels, places, events, weather and currency stay live. Flights use SerpApi #3/#2/#1, SearchApi or Duffel sandbox. Demo flight fallback is disabled.</p></CardContent></Card>
+        <Card><CardContent className="p-10 text-center"><Sparkles className="h-10 w-10 text-primary mx-auto mb-3" /><h3 className="font-semibold text-lg">Ready to generate</h3></CardContent></Card>
       )}
       {generating && (
-        <Card><CardContent className="p-12 text-center"><Loader2 className="h-9 w-9 animate-spin text-primary mx-auto mb-3" /><h3 className="font-semibold">{"Calling live APIs and building AI plan..."}</h3><p className="text-sm text-muted-foreground mt-1">{"Live flight, hotel, places, events, weather and currency APIs are called now. If all flight providers fail, no fake flight is generated."}</p></CardContent></Card>
+        <Card><CardContent className="p-12 text-center"><Loader2 className="h-9 w-9 animate-spin text-primary mx-auto mb-3" /><h3 className="font-semibold">{"Calling live APIs and building AI plan..."}</h3></CardContent></Card>
       )}
       {result && (
         <div className="space-y-5">
           <Card><CardHeader><CardTitle>{"Live API status"}</CardTitle></CardHeader><CardContent className="space-y-3"><div className="flex flex-wrap gap-2"><ApiStatus label="mode" value={result?.apiMode || "live"} /><ApiStatus label="flights" value={result.apiStatus?.flights} /><ApiStatus label="hotels" value={result.apiStatus?.hotels} /><ApiStatus label="places" value={result.apiStatus?.places} /><ApiStatus label="weather" value={result.apiStatus?.weather} /><ApiStatus label="events" value={result.apiStatus?.events} /><ApiStatus label="currency" value={result.apiStatus?.currency} /></div>{result.warnings?.length ? <div className="space-y-1">{result.warnings.map((w: string) => <p key={w} className="text-xs text-yellow-700 dark:text-yellow-200">• {w}</p>)}</div> : null}</CardContent></Card>
 
           {selectedFlight ? (
-            <Card className="sticky top-4 z-20 border-primary/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 shadow-lg">
+            <Card className="sticky top-4 z-20 border-primary/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 shadow-lg mobile-wrap">
               <CardContent className="p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Selected flight</p>
-                  <p className="font-semibold">{selectedFlight.route}</p>
-                  <p className="text-sm text-muted-foreground">{selectedFlight.airline} {selectedFlight.flightNumber ? `• ${selectedFlight.flightNumber}` : ""}</p>
+                  <p className="font-semibold break-words">{selectedFlight.route}</p>
+                  <p className="text-sm text-muted-foreground break-words">{selectedFlight.airline} {selectedFlight.flightNumber ? `• ${selectedFlight.flightNumber}` : ""}</p>
                 </div>
-                <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+                <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:w-auto lg:justify-end">
                   <div className="text-left lg:text-right">
                     <p className="text-xs text-muted-foreground">Total for {travelerCountNumber} traveler(s)</p>
                     <p className="font-bold text-lg">{formatCurrency(Number(selectedFlight.price || 0), selectedFlight.currency || form.currency)}</p>
                     {travelerCountNumber > 1 ? <p className="text-xs text-muted-foreground">{formatCurrency(Math.round(Number(selectedFlight.price || 0) / travelerCountNumber), selectedFlight.currency || form.currency)} per person</p> : null}
                   </div>
-                  <Button type="button" variant="secondary" size="sm" onClick={() => openFlightBooking(selectedFlight)}>View ticket / booking options</Button>
+                  <Button type="button" variant="secondary" size="sm" className="w-full sm:w-auto" onClick={() => openFlightBooking(selectedFlight)}>Booking options</Button>
                 </div>
               </CardContent>
             </Card>
@@ -819,14 +819,14 @@ export default function PlannerPage() {
 
           <Card className="border-primary/40 bg-primary/5"><CardHeader><CardTitle className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5" /> AI selected optimal plan</CardTitle></CardHeader><CardContent className="space-y-4">
             <div className="grid lg:grid-cols-2 gap-4">
-              <div className="rounded-2xl border bg-card p-4">
+              <div className="rounded-2xl border bg-card p-4 mobile-wrap">
                 <p className="text-xs text-muted-foreground mb-1">AI recommended flight</p>
                 <>
                   <p className="font-semibold">{selectedFlight?.route || "No live flight selected"}</p>
                   <p className="text-sm text-muted-foreground mt-1">{selectedFlight?.airline || "Select a live flight below"}</p>
                   {selectedFlight?.price ? <p className="text-sm mt-2"><b>{formatCurrency(Number(selectedFlight.price), selectedFlight.currency || form.currency)}</b> total for {travelerCountNumber} traveler(s){travelerCountNumber > 1 ? ` • ${formatCurrency(Math.round(Number(selectedFlight.price) / travelerCountNumber), selectedFlight.currency || form.currency)} per person` : ""}</p> : null}
                   {displayBudget?.overBudget ? <p className="text-sm text-destructive mt-2">Selected flight is {formatCurrency(displayBudget.overBudget, form.currency)} over your total budget.</p> : null}
-                  {selectedFlight?.bookingToken || selectedFlight?.departureToken || selectedFlight?.bookingUrl ? <Button type="button" variant="secondary" size="sm" className="mt-3" onClick={() => openFlightBooking(selectedFlight)}>View ticket / booking options</Button> : null}
+                  {selectedFlight?.bookingToken || selectedFlight?.departureToken || selectedFlight?.bookingUrl ? <Button type="button" variant="secondary" size="sm" className="mt-3 w-full sm:w-auto" onClick={() => openFlightBooking(selectedFlight)}>Booking options</Button> : null}
                 </>
               </div>
               <div className="rounded-2xl border bg-card p-4">
@@ -841,9 +841,9 @@ export default function PlannerPage() {
             {result.recommendations?.length ? <div className="grid md:grid-cols-2 gap-2">{result.recommendations.map((x: string) => <div key={x} className="rounded-xl border p-3 text-sm">{x}</div>)}</div> : null}
           </CardContent></Card>
 
-          <Card><CardHeader><CardTitle className="flex items-center gap-2"><Plane className="h-5 w-5" /> Flight options</CardTitle></CardHeader><CardContent className="space-y-4"><div className="rounded-2xl border bg-muted/20 p-4 space-y-4"><div className="grid md:grid-cols-2 xl:grid-cols-6 gap-3"><div><Label>Sort</Label><Select value={draftFlightSort} onChange={(e: any) => setDraftFlightSort(e.target.value)} className="mt-1"><option value="AI_BEST">AI best</option><option value="CHEAPEST">Cheapest</option><option value="FASTEST">Fastest</option><option value="FEWEST_STOPS">Fewest stops</option></Select></div><div><Label>Stops</Label><Select value={draftMaxStops} onChange={(e: any) => setDraftMaxStops(e.target.value)} className="mt-1"><option value="ANY">Any</option><option value="0">Direct only</option><option value="1">Max 1 stop</option><option value="2">Max 2 stops</option></Select></div><div><Label>Airline</Label><Select value={draftAirlineFilter} onChange={(e: any) => setDraftAirlineFilter(e.target.value)} className="mt-1"><option value="ALL">All airlines</option>{availableAirlines.map((name) => <option key={name} value={name}>{name}</option>)}</Select></div><div><Label>Departure</Label><Select value={draftDepartureTimeFilter} onChange={(e: any) => setDraftDepartureTimeFilter(e.target.value)} className="mt-1"><option value="ANY">Any time</option><option value="MORNING">Morning</option><option value="AFTERNOON">Afternoon</option><option value="EVENING">Evening</option><option value="NIGHT">Night</option></Select></div><div><Label>Max budget</Label><Input type="number" value={draftMaxFlightBudget} onChange={(e) => setDraftMaxFlightBudget(e.target.value)} placeholder="No limit" className="mt-1" /></div><div className="flex items-end"><label className="flex items-center gap-2 text-sm rounded-xl border px-3 py-2 h-10 w-full"><input type="checkbox" checked={draftDirectOnly} onChange={(e) => setDraftDirectOnly(e.target.checked)} /> Direct only</label></div></div><div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between"><p className="text-xs text-muted-foreground">Showing only the {filteredFlights.length} flight option(s) matching the applied filters out of {result.flights?.length || 0}. Change fields, then press Apply.</p><div className="flex gap-2"><Button type="button" size="sm" onClick={applyFlightFilters}>Apply filters</Button><Button type="button" size="sm" variant="outline" onClick={resetFlightFilters}>Reset filters</Button></div></div></div>{filteredFlights?.length ? filteredFlights.map((f: any, i: number) => { const active = selectedFlightId === f.id; const recommended = result.recommendedFlightId === f.id; return <div key={f.id || i} className={`rounded-2xl border p-5 grid lg:grid-cols-[1fr_auto] gap-4 transition-colors ${active ? "border-primary bg-primary/10" : "hover:bg-muted/30"}`}>
-            <div>
-              <div className="flex flex-wrap items-center gap-2"><p className="font-semibold text-lg">{f.route}</p><Badge variant="secondary">{f.source || result.flightSource || "Live API"}</Badge><Badge variant="outline">{f.cabinClass || form.flightCabin?.replace("_", " ") || "Economy"}</Badge>{recommended && <Badge variant="success">AI recommended</Badge>}{active && <Badge variant="default">Selected</Badge>}</div>
+          <Card><CardHeader><CardTitle className="flex items-center gap-2"><Plane className="h-5 w-5" /> Flight options</CardTitle></CardHeader><CardContent className="space-y-4"><div className="rounded-2xl border bg-muted/20 p-4 space-y-4"><div className="grid md:grid-cols-2 xl:grid-cols-6 gap-3"><div><Label>Sort</Label><Select value={draftFlightSort} onChange={(e: any) => setDraftFlightSort(e.target.value)} className="mt-1"><option value="AI_BEST">AI best</option><option value="CHEAPEST">Cheapest</option><option value="FASTEST">Fastest</option><option value="FEWEST_STOPS">Fewest stops</option></Select></div><div><Label>Stops</Label><Select value={draftMaxStops} onChange={(e: any) => setDraftMaxStops(e.target.value)} className="mt-1"><option value="ANY">Any</option><option value="0">Direct only</option><option value="1">Max 1 stop</option><option value="2">Max 2 stops</option></Select></div><div><Label>Airline</Label><Select value={draftAirlineFilter} onChange={(e: any) => setDraftAirlineFilter(e.target.value)} className="mt-1"><option value="ALL">All airlines</option>{availableAirlines.map((name) => <option key={name} value={name}>{name}</option>)}</Select></div><div><Label>Departure</Label><Select value={draftDepartureTimeFilter} onChange={(e: any) => setDraftDepartureTimeFilter(e.target.value)} className="mt-1"><option value="ANY">Any time</option><option value="MORNING">Morning</option><option value="AFTERNOON">Afternoon</option><option value="EVENING">Evening</option><option value="NIGHT">Night</option></Select></div><div><Label>Max budget</Label><Input type="number" value={draftMaxFlightBudget} onChange={(e) => setDraftMaxFlightBudget(e.target.value)} placeholder="No limit" className="mt-1" /></div><div className="flex items-end"><label className="flex items-center gap-2 text-sm rounded-xl border px-3 py-2 h-10 w-full"><input type="checkbox" checked={draftDirectOnly} onChange={(e) => setDraftDirectOnly(e.target.checked)} /> Direct only</label></div></div><div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mobile-wrap"><p className="text-xs text-muted-foreground">Showing only the {filteredFlights.length} flight option(s) matching the applied filters out of {result.flights?.length || 0}. Change fields, then press Apply.</p><div className="grid grid-cols-1 gap-2 sm:flex"><Button type="button" size="sm" className="w-full sm:w-auto" onClick={applyFlightFilters}>Apply filters</Button><Button type="button" size="sm" variant="outline" className="w-full sm:w-auto" onClick={resetFlightFilters}>Reset filters</Button></div></div></div>{filteredFlights?.length ? filteredFlights.map((f: any, i: number) => { const active = selectedFlightId === f.id; const recommended = result.recommendedFlightId === f.id; return <div key={f.id || i} className={`rounded-2xl border p-5 grid lg:grid-cols-[1fr_auto] gap-4 transition-colors mobile-wrap ${active ? "border-primary bg-primary/10" : "hover:bg-muted/30"}`}>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2"><p className="font-semibold text-lg break-words">{f.route}</p><Badge variant="secondary">{f.source || result.flightSource || "Live API"}</Badge><Badge variant="outline">{f.cabinClass || form.flightCabin?.replace("_", " ") || "Economy"}</Badge>{recommended && <Badge variant="success">AI recommended</Badge>}{active && <Badge variant="default">Selected</Badge>}</div>
               {f.outbound ? (
                 <div className="mt-4 space-y-3 text-sm text-muted-foreground">
                   <div className="rounded-xl border bg-card/60 p-3">
@@ -882,10 +882,10 @@ export default function PlannerPage() {
               <p className="text-xs text-muted-foreground mt-2">{Number.isFinite(f.stops) ? `${f.stops} total stop(s)` : "Stops not provided"}</p>
               {f.aiReason ? <p className="text-xs text-primary mt-2">{f.aiReason}</p> : null}
             </div>
-            <div className="flex lg:flex-col items-center lg:items-end justify-between gap-3">
+            <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between lg:w-auto lg:flex-col lg:items-end">
               <div className="text-right"><p className="text-xs text-muted-foreground">Total for {travelerCountNumber} traveler(s)</p><p className="font-bold text-xl">{f.price ? formatCurrency(Number(f.price), f.currency || form.currency) : "No price"}</p>{f.price && travelerCountNumber > 1 ? <p className="text-xs text-muted-foreground">{formatCurrency(Math.round(Number(f.price) / travelerCountNumber), f.currency || form.currency)} per person</p> : null}</div>
-              <Button variant={active ? "default" : "outline"} onClick={() => setSelectedFlightId(f.id)}>{active ? "Selected" : "Select flight"}</Button>
-              {f.bookingToken || f.departureToken || f.bookingUrl ? <Button type="button" variant="secondary" size="sm" onClick={() => openFlightBooking(f)}>View ticket / booking options</Button> : null}
+              <Button variant={active ? "default" : "outline"} className="w-full sm:w-auto" onClick={() => setSelectedFlightId(f.id)}>{active ? "Selected" : "Select flight"}</Button>
+              {f.bookingToken || f.departureToken || f.bookingUrl ? <Button type="button" variant="secondary" size="sm" className="w-full sm:w-auto" onClick={() => openFlightBooking(f)}>Booking options</Button> : null}
             </div>
           </div>}) : <div className="rounded-xl border border-destructive/40 p-4 text-sm text-destructive flex gap-2"><AlertTriangle className="h-4 w-4" /> No flight matches these filters. Clear filters or generate another route/date.</div>}</CardContent></Card>
 
@@ -908,10 +908,10 @@ export default function PlannerPage() {
                 {h.amenities?.length ? <p className="text-xs text-muted-foreground mt-3"><b>Amenities:</b> {h.amenities.slice(0, 6).join(", ")}</p> : null}
                 {h.aiReason ? <p className="text-xs text-primary mt-2">{h.aiReason}</p> : null}
               </div>
-              <div className="flex lg:flex-col items-center lg:items-end justify-between gap-3">
+              <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between lg:w-auto lg:flex-col lg:items-end">
                 <div className="text-right"><p className="text-xs text-muted-foreground">Hotel total</p><p className="font-bold text-xl">{h.price ? formatCurrency(Number(h.price), h.currency || form.currency) : "No price"}</p>{h.originalPrice && h.originalCurrency && h.originalCurrency !== (h.currency || form.currency) ? <p className="text-xs text-muted-foreground">Original: {h.originalPrice} {h.originalCurrency}</p> : null}</div>
-                <Button variant={active ? "default" : "outline"} onClick={() => setSelectedHotelId(h.id)}>{active ? "Selected" : "Select hotel"}</Button>
-                <Button type="button" variant="secondary" size="sm" onClick={() => openHotelBooking(h)}>Open hotel</Button>
+                <Button variant={active ? "default" : "outline"} className="w-full sm:w-auto" onClick={() => setSelectedHotelId(h.id)}>{active ? "Selected" : "Select hotel"}</Button>
+                <Button type="button" variant="secondary" size="sm" className="w-full sm:w-auto" onClick={() => openHotelBooking(h)}>Open hotel</Button>
               </div>
             </div>}) : <div className="rounded-xl border border-destructive/40 p-4 text-sm text-destructive flex gap-2"><AlertTriangle className="h-4 w-4" /> No live hotel options returned. Check SEARCHAPI_KEY, destination and dates. No mock hotel data is shown.</div>}
           </CardContent></Card>
