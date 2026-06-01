@@ -105,7 +105,7 @@ export default function AdminDashboardPage() {
             </p>
           </div>
         </div>
-        <Button variant="outline" onClick={load} className="gap-2"><RefreshCw className="h-4 w-4" /> Refresh</Button>
+        <Button variant="outline" onClick={() => load(false)} className="gap-2"><RefreshCw className="h-4 w-4" /> Refresh</Button>
       </div>
 
       {/* Role info banner for Manager/Super Admin */}
