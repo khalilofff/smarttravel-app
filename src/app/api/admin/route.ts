@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
         prisma.user.findMany({
           where: { role: "USER" },
           orderBy: { createdAt: "desc" }, take: 6,
-          select: { id: true, name: true, email: true, role: true, createdAt: true, isActive: true, emailVerified: true },
+          select: { id: true, name: true, email: true, role: true, createdAt: true, updatedAt: true, isActive: true, emailVerified: true },
         }),
         prisma.trip.findMany({ orderBy: { createdAt: "desc" }, take: 6, select: { id: true, title: true, status: true, totalBudget: true, createdAt: true, user: { select: { name: true, email: true } } } }),
         prisma.booking.findMany({ orderBy: { createdAt: "desc" }, take: 6, select: { id: true, provider: true, type: true, status: true, amount: true, createdAt: true, user: { select: { name: true, email: true } }, trip: { select: { title: true } } } }),
@@ -96,6 +96,12 @@ export async function GET(req: NextRequest) {
         prisma.booking.groupBy({ by: ["status"], _count: true }),
         prisma.trip.groupBy({ by: ["status"], _count: true }),
       ]);
+
+      const onlineCutoff = Date.now() - 2 * 60 * 1000;
+      const recentUsersWithPresence = recentUsers.map((u) => ({
+        ...u,
+        isOnline: u.isActive && new Date(u.updatedAt).getTime() >= onlineCutoff,
+      }));
 
       return NextResponse.json({
         stats: {
@@ -106,7 +112,7 @@ export async function GET(req: NextRequest) {
           txCount,
           totalDestinations, activeDestinations, unreadNotifications, pendingReports, userLogCount,
         },
-        recentUsers, recentTrips, recentBookings, recentActivity,
+        recentUsers: recentUsersWithPresence, recentTrips, recentBookings, recentActivity,
         bookingsByStatus: normCount(bookingsByStatus),
         tripsByStatus: normCount(tripsByStatus),
       });

@@ -149,12 +149,18 @@ export default function AdminDashboardPage() {
           <CardHeader><CardTitle className="text-base flex items-center gap-2"><Users className="h-4 w-4" /> Recent Users</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {(data?.recentUsers || []).map((u: any) => (
-              <div key={u.id} className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">{u.name || "Unnamed"}</p>
-                  <p className="text-xs text-muted-foreground">{u.email}</p>
+              <div key={u.id} className="flex items-center justify-between gap-3 rounded-xl border border-border/50 bg-muted/10 px-3 py-2">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold leading-tight truncate">{u.name || "Unnamed"}</p>
+                  <p className="text-xs text-muted-foreground truncate max-w-[13rem] sm:max-w-none">{u.email}</p>
                 </div>
-                <Badge variant={u.isActive ? "success" : "destructive"}>{u.isActive ? "Active" : "Disabled"}</Badge>
+                {!u.isActive ? (
+                  <Badge variant="destructive" className="shrink-0 px-2 py-0.5 text-[10px]">Disabled</Badge>
+                ) : u.isOnline ? (
+                  <Badge variant="success" className="shrink-0 px-2 py-0.5 text-[10px]">Online</Badge>
+                ) : (
+                  <Badge variant="secondary" className="shrink-0 px-2 py-0.5 text-[10px]">Offline</Badge>
+                )}
               </div>
             ))}
             {(!data?.recentUsers || data.recentUsers.length === 0) && <p className="text-sm text-muted-foreground text-center py-4">No users yet.</p>}

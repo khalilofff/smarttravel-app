@@ -850,3 +850,87 @@ input[type="date"].smart-date-empty::-webkit-datetime-edit {
     pointer-events: none;
   }
 }
+
+/* Mobile behavior fix: no background movement behind dialogs and no bounce gap while scrolling. */
+@media (max-width: 640px) {
+  html,
+  body {
+    overscroll-behavior-y: none !important;
+  }
+
+  body.dialog-open,
+  body.mobile-menu-open {
+    overflow: hidden !important;
+    position: fixed;
+    width: 100%;
+    inset: 0;
+    touch-action: none !important;
+  }
+
+  .dashboard-scroll-area {
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-dialog {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+    border-bottom-width: 0 !important;
+    box-shadow: 0 -20px 70px rgba(0,0,0,.55) !important;
+  }
+
+  .mobile-dialog form,
+  .mobile-dialog .grid {
+    min-width: 0 !important;
+  }
+
+  .mobile-dialog input,
+  .mobile-dialog select,
+  .mobile-dialog textarea,
+  .mobile-dialog button {
+    max-width: 100% !important;
+  }
+
+  .mobile-dialog .grid-cols-2 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .mobile-dialog .flex.justify-end {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    width: 100%;
+  }
+
+  .mobile-dialog .flex.justify-end > button {
+    width: 100% !important;
+  }
+
+  .mobile-page-pad input[type="date"],
+  .mobile-dialog input[type="date"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    line-height: 42px !important;
+    padding-left: 0.85rem !important;
+    padding-right: 0.85rem !important;
+    -webkit-appearance: none;
+    appearance: none;
+    display: block !important;
+    overflow: hidden;
+  }
+
+  .mobile-page-pad input[type="date"]::-webkit-date-and-time-value,
+  .mobile-dialog input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+    min-height: 1.2em;
+  }
+
+  .mobile-page-pad .date-input,
+  .mobile-page-pad .smart-date-empty {
+    min-width: 0 !important;
+  }
+}

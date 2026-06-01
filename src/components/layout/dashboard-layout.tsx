@@ -100,6 +100,29 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
+    if (!user?.id) return;
+    let stopped = false;
+    const pingPresence = async () => {
+      if (stopped || document.visibilityState === "hidden") return;
+      try {
+        await fetch("/api/presence", { method: "POST", cache: "no-store" });
+      } catch {
+        // Presence is best-effort only.
+      }
+    };
+    pingPresence();
+    const interval = window.setInterval(pingPresence, 30000);
+    window.addEventListener("focus", pingPresence);
+    document.addEventListener("visibilitychange", pingPresence);
+    return () => {
+      stopped = true;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", pingPresence);
+      document.removeEventListener("visibilitychange", pingPresence);
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
     document.body.classList.toggle("mobile-menu-open", mobileOpen);
     return () => document.body.classList.remove("mobile-menu-open");
   }, [mobileOpen]);
@@ -240,6 +263,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </button>
           <button onClick={async () => {
             try {
+              await fetch("/api/presence", { method: "DELETE", keepalive: true });
               document.cookie = "smarttravel-active-slot=; Max-Age=0; path=/";
               sessionStorage.removeItem("smarttravel-tab-slot");
             } catch {}
@@ -311,7 +335,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_80%_0%,rgba(128,171,171,0.16),transparent_34rem)]">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-[radial-gradient(circle_at_80%_0%,rgba(128,171,171,0.16),transparent_34rem)] dashboard-scroll-area">
           <div className="mobile-page-pad p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto w-full min-w-0">{children}</div>
         </div>
 

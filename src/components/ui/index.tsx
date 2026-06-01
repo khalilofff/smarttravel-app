@@ -243,14 +243,28 @@ function StatCard({ title, value, subtitle, icon: Icon, trend }: {
 
 // ─── DIALOG (simplified) ────────────────────────
 function Dialog({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children?: ReactNode }) {
+  React.useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    const previousTouchAction = document.body.style.touchAction;
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    document.body.classList.add("dialog-open");
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.touchAction = previousTouchAction;
+      document.body.classList.remove("dialog-open");
+    };
+  }, [open]);
+
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-2 sm:p-4">
-      <div className="fixed inset-0 bg-black/55 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-50 w-full sm:max-w-lg max-h-[88dvh] sm:max-h-[86vh] overflow-y-auto rounded-2xl sm:rounded-2xl bg-card border shadow-2xl animate-fade-in overscroll-contain mobile-dialog">
-        <div className="sticky top-0 z-10 flex items-center justify-between p-4 sm:p-6 border-b bg-card/95 backdrop-blur">
-          <h2 className="text-lg font-semibold">{title}</h2>
-          <button onClick={onClose} className="rounded-lg p-2 hover:bg-muted transition-colors" aria-label="Close dialog">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4 overflow-hidden overscroll-none">
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-md overscroll-none touch-none" onClick={onClose} />
+      <div className="relative z-50 w-full sm:max-w-lg max-h-[82dvh] sm:max-h-[86vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl bg-card border border-border shadow-2xl animate-fade-in overscroll-contain mobile-dialog safe-bottom">
+        <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 sm:p-6 border-b bg-card/98 backdrop-blur">
+          <h2 className="text-base sm:text-lg font-bold">{title}</h2>
+          <button onClick={onClose} className="rounded-xl p-2 hover:bg-muted transition-colors" aria-label="Close dialog">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
