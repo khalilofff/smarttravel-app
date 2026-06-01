@@ -175,7 +175,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const adminItems = isSuperManager ? superManagerItems : adminOnlyItems;
 
   return (
-    <div className="flex h-[100dvh] w-full max-w-full overflow-hidden bg-background text-foreground" suppressHydrationWarning>
+    <div className="dashboard-shell flex h-[100dvh] w-full max-w-full overflow-hidden bg-background text-foreground" suppressHydrationWarning>
       {mobileOpen && <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-[2px] lg:hidden" onClick={() => setMobileOpen(false)} />}
 
       <aside suppressHydrationWarning className={cn(
@@ -281,8 +281,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
-        <header className="flex items-center min-h-16 w-full max-w-full px-2 sm:px-4 lg:px-6 border-b border-border bg-card/90 backdrop-blur-xl shrink-0 gap-2 sm:gap-4 overflow-hidden">
+      <main className="dashboard-main flex-1 min-w-0 flex flex-col overflow-hidden">
+        <header className="dashboard-header flex items-center min-h-16 w-full max-w-full px-2 sm:px-4 lg:px-6 border-b border-border bg-card/90 backdrop-blur-xl shrink-0 gap-2 sm:gap-4 overflow-hidden">
           <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-muted"><Menu className="h-5 w-5" /></button>
           <div className="flex-1 min-w-0 flex items-center gap-4">
             <div className="relative hidden sm:block max-w-sm flex-1">
@@ -336,7 +336,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </header>
 
         <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-[radial-gradient(circle_at_80%_0%,rgba(128,171,171,0.16),transparent_34rem)] dashboard-scroll-area">
-          <div className="mobile-page-pad p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto w-full min-w-0">{children}</div>
+          <div className="dashboard-content mobile-page-pad p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto w-full min-w-0">{children}</div>
         </div>
 
         <nav className="dashboard-mobile-bottom-nav fixed bottom-0 left-0 right-0 z-30 hidden grid-cols-4 border-t border-border bg-card/95 px-2 pb-[env(safe-area-inset-bottom)] pt-2 shadow-2xl backdrop-blur-xl lg:hidden">
