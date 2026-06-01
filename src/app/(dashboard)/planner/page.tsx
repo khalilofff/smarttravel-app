@@ -47,6 +47,30 @@ function airportDisplay(a?: AirportOption | null) {
   return `${a.city || a.airport}${a.iata ? ` - ${a.iata}` : ""}${a.terminal ? ` - ${a.terminal}` : ""}`;
 }
 
+function PlannerDateInput({
+  value,
+  onChange,
+  disabled = false,
+}: {
+  value: string;
+  onChange: (event: any) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className={`smart-date-shell ${disabled ? "smart-date-disabled" : ""}`}>
+      <span className={value ? "smart-date-value" : "smart-date-placeholder"}>{value || "yyyy-mm-dd"}</span>
+      <input
+        type="date"
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        className="smart-date-native"
+        aria-label="Select date"
+      />
+    </div>
+  );
+}
+
 function AirportSearchBox({
   title,
   query,
@@ -689,8 +713,8 @@ export default function PlannerPage() {
 
             <div className="grid md:grid-cols-2 xl:grid-cols-6 gap-4">
               <div><Label>Ticket type</Label><Select value={form.tripType} onChange={(e: any) => setForm(prev => ({ ...prev, tripType: e.target.value, returnDate: e.target.value === "ONE_WAY" ? "" : prev.returnDate }))} className="mt-1 h-12"><option value="ROUND_TRIP">Round trip</option><option value="ONE_WAY">One way</option></Select></div>
-              <div><Label>Departure date</Label><Input type="text" inputMode="numeric" value={form.departureDate} onChange={set("departureDate")} placeholder="yyyy-mm-dd" className="smart-date-input mt-1 h-12" /></div>
-              <div><Label>{form.tripType === "ROUND_TRIP" ? "Return date" : "Return date disabled"}</Label><Input type="text" inputMode="numeric" value={form.returnDate} onChange={set("returnDate")} placeholder="yyyy-mm-dd" disabled={form.tripType === "ONE_WAY"} className="smart-date-input mt-1 h-12" /></div>
+              <div><Label>Departure date</Label><PlannerDateInput value={form.departureDate} onChange={set("departureDate")} /></div>
+              <div><Label>{form.tripType === "ROUND_TRIP" ? "Return date" : "Return date disabled"}</Label><PlannerDateInput value={form.returnDate} onChange={set("returnDate")} disabled={form.tripType === "ONE_WAY"} /></div>
               <div><Label>Travelers</Label><Input type="number" min="1" value={form.travelerCount} onChange={set("travelerCount")} className="mt-1 h-12" /></div>
               <div><Label>Currency</Label><Select value={form.currency} onChange={set("currency")} className="mt-1 h-12"><option>USD</option><option>EUR</option><option>TRY</option><option>AZN</option></Select></div>
               <div><Label>Flight cabin</Label><Select value={form.flightCabin} onChange={set("flightCabin")} className="mt-1 h-12"><option value="ECONOMY">Economy</option><option value="PREMIUM_ECONOMY">Premium Economy</option><option value="BUSINESS">Business</option><option value="FIRST">First Class</option></Select></div>
