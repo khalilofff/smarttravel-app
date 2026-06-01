@@ -57,7 +57,8 @@ export function buildAuthOptions(slot?: string): NextAuthOptions {
         const user = await prisma.user.findUnique({
           where: { email: credentials.email.toLowerCase() },
         });
-        if (!user || !user.passwordHash || !user.isActive) return null;
+        if (!user || !user.passwordHash) return null;
+        if (!user.isActive) throw new Error("ACCOUNT_DISABLED");
         const valid = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!valid) return null;
         const emailVerificationEnabled = process.env.EMAIL_VERIFICATION_ENABLED === "true";

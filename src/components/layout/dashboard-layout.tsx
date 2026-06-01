@@ -105,7 +105,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     const pingPresence = async () => {
       if (stopped || document.visibilityState === "hidden") return;
       try {
-        await fetch("/api/presence", { method: "POST", cache: "no-store" });
+        const res = await fetch("/api/presence", { method: "POST", cache: "no-store" });
+        if (res.status === 403) {
+          await signOut({ redirect: false });
+          window.location.replace("/login?disabled=1");
+        }
       } catch {
         // Presence is best-effort only.
       }

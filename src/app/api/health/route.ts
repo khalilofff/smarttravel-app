@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import os from "os";
 
 export const runtime = "nodejs";
 
@@ -11,8 +12,10 @@ function formatServiceState(value: ServiceState) {
 
 export async function GET() {
   const startedAt = Date.now();
-  const uptimeSeconds = Math.max(0, Math.floor(process.uptime()));
-  const serverStartedAt = new Date(Date.now() - uptimeSeconds * 1000).toISOString();
+  const processUptimeSeconds = Math.max(0, Math.floor(process.uptime()));
+  const osUptimeSeconds = Math.max(0, Math.floor(os.uptime()));
+  const serverStartedAt = new Date(Date.now() - osUptimeSeconds * 1000).toISOString();
+  const appStartedAt = new Date(Date.now() - processUptimeSeconds * 1000).toISOString();
 
   let database: ServiceState = "connected";
   let databaseLatencyMs: number | null = null;
@@ -47,7 +50,9 @@ export async function GET() {
     app: "SmartTravel",
     timestamp: new Date().toISOString(),
     serverStartedAt,
-    uptimeSeconds,
+    uptimeSeconds: osUptimeSeconds,
+    processUptimeSeconds,
+    appStartedAt,
     responseTimeMs,
     databaseLatencyMs,
     nodeVersion: process.version,

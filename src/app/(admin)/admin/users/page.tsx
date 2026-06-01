@@ -9,12 +9,12 @@ import toast from "react-hot-toast";
 
 function RoleLabel({ role }: { role: string }) {
   if (role === "SUPER_ADMIN") return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-600 border border-amber-500/30">
+    <span className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-600 border border-amber-500/30">
       <Crown className="h-3 w-3" /> Super Admin
     </span>
   );
   if (role === "MANAGER") return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-600 border border-blue-500/30">
+    <span className="inline-flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-600 border border-blue-500/30">
       <ShieldCheck className="h-3 w-3" /> Manager
     </span>
   );
@@ -147,6 +147,10 @@ export default function AdminUsersPage() {
         <Button onClick={() => runBulk("BULK_DISABLE")} variant="outline" disabled={!selected.length}>Disable Selected</Button>
       </div>
 
+      <div className="rounded-xl border border-border bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
+        Status is live: <b className="text-green-400">Active now</b> means the user has sent activity in the last 45 seconds. <b>Inactive</b> means no recent activity. <b className="text-red-400">Disabled</b> users are logged out and cannot sign in.
+      </div>
+
       {loading ? (
         <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
       ) : (
@@ -183,9 +187,9 @@ export default function AdminUsersPage() {
                         <td className="p-3">
                           <div className="flex items-center gap-2">
                             <Avatar name={u.name} size="sm" />
-                            <div>
-                              <p className="font-medium">{u.name || "Unnamed"}</p>
-                              <p className="text-xs text-muted-foreground">{u.email}</p>
+                            <div className="min-w-0">
+                              <p className="font-medium truncate">{u.name || "Unnamed"}</p>
+                              <p className="max-w-[180px] truncate text-xs text-muted-foreground" title={u.email}>{u.email}</p>
                             </div>
                           </div>
                         </td>
@@ -212,11 +216,11 @@ export default function AdminUsersPage() {
                         </td>
                         <td className="p-3">
                           {!u.isActive ? (
-                            <Badge variant="destructive">Disabled</Badge>
+                            <Badge variant="destructive" title="This user cannot sign in until reactivated">Disabled</Badge>
                           ) : u.isOnline ? (
-                            <Badge variant="success">Active</Badge>
+                            <Badge variant="success" title="User is currently active in the app">Active now</Badge>
                           ) : (
-                            <Badge variant="secondary">Inactive</Badge>
+                            <Badge variant="secondary" title="No recent activity in the last 45 seconds">Inactive</Badge>
                           )}
                         </td>
                         <td className="p-3 text-muted-foreground">{formatDate(u.createdAt)}</td>
@@ -226,22 +230,22 @@ export default function AdminUsersPage() {
                               <Lock className="h-3 w-3" /> Protected
                             </span>
                           ) : (
-                            <div className="flex gap-1 justify-end">
-                              <Link title="View details" href={`/admin/users/${u.id}`} className="p-1.5 rounded hover:bg-muted">
+                            <div className="flex items-center justify-end gap-1">
+                              <Link title="View details" href={`/admin/users/${u.id}`} className="admin-action-icon inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted">
                                 <Eye className="h-4 w-4" />
                               </Link>
                               {u.isActive
                                 ? <button title="Disable user" onClick={() => setConfirmAction({ userId: u.id, action: "suspend", name: u.name || u.email })}
-                                    className="p-1.5 rounded hover:bg-orange-100 dark:hover:bg-orange-900/30">
+                                    className="admin-action-icon inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/30">
                                     <UserX className="h-4 w-4 text-orange-600" />
                                   </button>
                                 : <button title="Activate user" onClick={() => setConfirmAction({ userId: u.id, action: "activate", name: u.name || u.email })}
-                                    className="p-1.5 rounded hover:bg-green-100 dark:hover:bg-green-900/30">
+                                    className="admin-action-icon inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30">
                                     <UserCheck className="h-4 w-4 text-green-600" />
                                   </button>
                               }
                               <button title="Safe disable" onClick={() => setConfirmAction({ userId: u.id, action: "delete", name: u.name || u.email })}
-                                className="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-900/30">
+                                className="admin-action-icon inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30">
                                 <Trash2 className="h-4 w-4 text-red-600" />
                               </button>
                             </div>

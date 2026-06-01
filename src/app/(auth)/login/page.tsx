@@ -25,6 +25,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     try {
+      if (new URLSearchParams(window.location.search).get("disabled") === "1") {
+        setError("Your account has been disabled by an administrator. Please contact the SmartTravel admin team.");
+      }
       const raw = window.localStorage.getItem(LOCAL_LOGIN_USERS_KEY);
       const localUsers = raw ? JSON.parse(raw) : [];
       if (Array.isArray(localUsers) && localUsers.length) {
@@ -63,6 +66,8 @@ export default function LoginPage() {
       if (res?.error || !res?.ok) {
         if (res?.error === "EMAIL_NOT_VERIFIED") {
           setError("Please verify your email before signing in.");
+        } else if (res?.error === "ACCOUNT_DISABLED") {
+          setError("Your account has been disabled by an administrator. Please contact the SmartTravel admin team.");
         } else if (res?.error === "TWO_FACTOR_REQUIRED") {
           setNeedsTwoFactor(true);
           setError("2FA is paused for the current presentation demo accounts.");

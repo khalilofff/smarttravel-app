@@ -48,6 +48,20 @@ async function logAction(
   }
 }
 
+async function notifyUsers(userIds: string[], title: string, message: string) {
+  const cleanIds = Array.from(new Set(userIds.filter(Boolean)));
+  if (!cleanIds.length) return;
+  await prisma.notification.createMany({
+    data: cleanIds.map((userId) => ({
+      userId,
+      type: "ACCOUNT",
+      title,
+      message,
+      link: "/profile",
+    })),
+  });
+}
+
 export async function GET(req: NextRequest) {
   try {
     const actor = await requireAdminOrManagerOrSuperAdmin();
@@ -426,8 +440,10 @@ export async function PATCH(req: NextRequest) {
       if (!safeIds.length) return NextResponse.json({ error: "No valid users to act on" }, { status: 400 });
       if (action === "BULK_DISABLE") {
         await prisma.user.updateMany({ where: { id: { in: safeIds } }, data: { isActive: false } });
+        await notifyUsers(safeIds, "Account disabled", "Your SmartTravel account has been disabled by an administrator. Contact support if you think this is a mistake.");
       } else if (action === "BULK_ENABLE") {
         await prisma.user.updateMany({ where: { id: { in: safeIds } }, data: { isActive: true } });
+        await notifyUsers(safeIds, "Account reactivated", "Your SmartTravel account has been reactivated. You can sign in again.");
       } else if (action === "BULK_MAKE_USER") {
         if (!isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         await prisma.user.updateMany({ where: { id: { in: safeIds } }, data: { role: "USER" } });
@@ -456,10 +472,13 @@ export async function PATCH(req: NextRequest) {
       }
 
       if (action === "suspend" || action === "TOGGLE_ACTIVE") {
-        await prisma.user.update({ where: { id: userId }, data: { isActive: !target.isActive } });
+        const nextActive = !target.isActive;
+        await prisma.user.update({ where: { id: userId }, data: { isActive: nextActive } });
+        await notifyUsers([userId], nextActive ? "Account reactivated" : "Account disabled", nextActive ? "Your SmartTravel account has been reactivated. You can sign in again." : "Your SmartTravel account has been disabled by an administrator. Contact support if you think this is a mistake.");
         await logAction(actor, "TOGGLE_USER_ACTIVE", "User", userId);
       } else if (action === "activate") {
         await prisma.user.update({ where: { id: userId }, data: { isActive: true } });
+        await notifyUsers([userId], "Account reactivated", "Your SmartTravel account has been reactivated. You can sign in again.");
         await logAction(actor, "ACTIVATE_USER", "User", userId);
       } else if (action === "MAKE_MANAGER") {
         if (!isSuperAdmin) return NextResponse.json({ error: "Forbidden: Only Super Admin can promote to Manager" }, { status: 403 });
@@ -475,6 +494,7 @@ export async function PATCH(req: NextRequest) {
         await logAction(actor, "MAKE_SUPER_ADMIN", "User", userId);
       } else if (action === "delete") {
         await prisma.user.update({ where: { id: userId }, data: { isActive: false } });
+        await notifyUsers([userId], "Account disabled", "Your SmartTravel account has been disabled by an administrator. Contact support if you think this is a mistake.");
         await logAction(actor, "DISABLE_USER", "User", userId, "Safe local-demo delete: user disabled, data preserved.");
       } else {
         return NextResponse.json({ error: "Unsupported action" }, { status: 400 });

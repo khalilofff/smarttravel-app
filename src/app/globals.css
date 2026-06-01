@@ -1059,3 +1059,19 @@ input[type="date"].smart-date-empty::-webkit-datetime-edit {
     max-width: calc(100vw - 2rem);
   }
 }
+
+/* Admin icon polish: keeps all small admin action icons centered inside their hit boxes. */
+.admin-icon-box,
+.admin-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.admin-action-icon svg,
+.admin-icon-box svg {
+  display: block;
+  flex-shrink: 0;
+}
