@@ -297,19 +297,28 @@ Select.displayName = "Select";
 
 // ─── TABS ───────────────────────────────────────
 function Tabs({ tabs, activeTab, onChange }: { tabs: { id: string; label: string; icon?: React.ElementType }[]; activeTab: string; onChange: (id: string) => void }) {
+  const listRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const activeButton = listRef.current?.querySelector<HTMLButtonElement>(`[data-tab-id="${activeTab}"]`);
+    activeButton?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  }, [activeTab]);
+
   return (
-    <div className="flex gap-1 p-1 rounded-xl bg-muted overflow-x-auto max-w-full scrollbar-hide">
+    <div ref={listRef} className="mobile-centered-tabs flex gap-1 p-1 rounded-xl bg-muted overflow-x-auto max-w-full scrollbar-hide">
       {tabs.map(tab => (
         <button
           key={tab.id}
+          data-tab-id={tab.id}
+          aria-selected={activeTab === tab.id}
           onClick={() => onChange(tab.id)}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
+            "flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0",
             activeTab === tab.id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
           )}
         >
-          {tab.icon && <tab.icon className="h-4 w-4" />}
-          {tab.label}
+          {tab.icon && <tab.icon className="h-4 w-4 shrink-0" />}
+          <span>{tab.label}</span>
         </button>
       ))}
     </div>

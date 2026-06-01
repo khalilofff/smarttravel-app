@@ -1034,3 +1034,28 @@ input[type="date"].smart-date-empty::-webkit-datetime-edit {
     overscroll-behavior: contain !important;
   }
 }
+
+/* Mobile tab alignment: when a user selects Budget/Bookings/Team/Comments,
+   the active tab is centered instead of staying half-hidden at the edge. */
+@media (max-width: 640px) {
+  .mobile-centered-tabs {
+    width: 100% !important;
+    max-width: 100% !important;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 42%;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+  }
+
+  .mobile-centered-tabs > button {
+    scroll-snap-align: center;
+    min-width: max-content;
+    flex: 0 0 auto;
+  }
+
+  .mobile-centered-tabs > button[aria-selected="true"],
+  .mobile-centered-tabs > button[data-tab-id] {
+    max-width: calc(100vw - 2rem);
+  }
+}
