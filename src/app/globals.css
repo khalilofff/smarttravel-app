@@ -1060,18 +1060,31 @@ input[type="date"].smart-date-empty::-webkit-datetime-edit {
   }
 }
 
-/* Admin icon polish: keeps all small admin action icons centered inside their hit boxes. */
+/* Admin icon polish: keeps every admin icon centered inside its own box. */
 .admin-icon-box,
 .admin-action-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  flex-shrink: 0;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+  vertical-align: middle !important;
+  overflow: hidden !important;
+}
+
+.admin-action-icon {
+  width: 2rem;
+  height: 2rem;
 }
 
 .admin-action-icon svg,
 .admin-icon-box svg {
-  display: block;
-  flex-shrink: 0;
+  display: block !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+}
+
+.admin-icon-box svg {
+  max-width: 55%;
+  max-height: 55%;
 }

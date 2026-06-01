@@ -117,7 +117,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center gap-3">
-        <Users className="h-6 w-6 text-primary" />
+        <span className="admin-icon-box h-10 w-10 rounded-xl bg-primary/10 text-primary"><Users className="h-5 w-5" /></span>
         <div>
           <h1 className="text-2xl font-bold font-display">User Management</h1>
           <p className="text-sm text-muted-foreground">
@@ -230,7 +230,7 @@ export default function AdminUsersPage() {
                               <Lock className="h-3 w-3" /> Protected
                             </span>
                           ) : (
-                            <div className="flex items-center justify-end gap-1">
+                            <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
                               <Link title="View details" href={`/admin/users/${u.id}`} className="admin-action-icon inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted">
                                 <Eye className="h-4 w-4" />
                               </Link>

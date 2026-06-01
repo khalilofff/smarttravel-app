@@ -18,7 +18,6 @@ import {
   HardDrive,
   Bot,
   ExternalLink,
-  Power,
 } from "lucide-react";
 
 type HealthData = {
@@ -94,10 +93,10 @@ function StatusTile({
   }[tone];
 
   return (
-    <div className="rounded-2xl border border-border bg-card/80 p-4">
-      <div className="flex items-center gap-3">
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${toneClass}`}>
-          <Icon className="h-5 w-5 shrink-0" />
+    <div className="rounded-2xl border border-border bg-card/80 p-4 overflow-hidden">
+      <div className="flex min-h-[4.25rem] items-center gap-3">
+        <div className={`admin-icon-box h-11 w-11 rounded-xl border ${toneClass}`}>
+          <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
@@ -194,7 +193,7 @@ export default function AdminSystemPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+          <div className="admin-icon-box h-12 w-12 rounded-2xl border border-primary/20 bg-primary/10 text-primary">
             <Database className="h-6 w-6" />
           </div>
           <div>
@@ -217,8 +216,8 @@ export default function AdminSystemPage() {
       <div className="grid md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-5">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-500"><ShieldCheck className="h-5 w-5" /></span>
+            <div className="flex items-center gap-3">
+              <span className="admin-icon-box h-10 w-10 rounded-xl bg-green-500/10 text-green-500"><ShieldCheck className="h-5 w-5" /></span>
               <div>
                 <h3 className="font-semibold">Presentation Safe</h3>
                 <p className="mt-1 text-sm text-muted-foreground">The admin UI shows safe live status information for the presentation build.</p>
@@ -229,8 +228,8 @@ export default function AdminSystemPage() {
         </Card>
         <Card>
           <CardContent className="p-5">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><Database className="h-5 w-5" /></span>
+            <div className="flex items-center gap-3">
+              <span className="admin-icon-box h-10 w-10 rounded-xl bg-primary/10 text-primary"><Database className="h-5 w-5" /></span>
               <div>
                 <h3 className="font-semibold">Database</h3>
                 <p className="mt-1 text-sm text-muted-foreground">Prisma is checked through a real server route, not static text.</p>
@@ -241,8 +240,8 @@ export default function AdminSystemPage() {
         </Card>
         <Card>
           <CardContent className="p-5">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><Server className="h-5 w-5" /></span>
+            <div className="flex items-center gap-3">
+              <span className="admin-icon-box h-10 w-10 rounded-xl bg-primary/10 text-primary"><Server className="h-5 w-5" /></span>
               <div>
                 <h3 className="font-semibold">Runtime</h3>
                 <p className="mt-1 text-sm text-muted-foreground">Current Node runtime and deployed server process information.</p>
@@ -293,11 +292,10 @@ export default function AdminSystemPage() {
           {healthError ? (
             <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">{healthError}</div>
           ) : (
-            <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-4">
-              <StatusTile icon={Power} label="Server" value={health?.status === "ok" ? "Running" : health?.status === "degraded" ? "Limited" : "Checking..."} sub={health?.nodeVersion || "Node runtime"} tone={statusTone} />
+            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+              <StatusTile icon={Server} label="Server" value={health?.status === "ok" ? "Running" : health?.status === "degraded" ? "Limited" : "Checking..."} sub={health?.nodeVersion || "Node runtime"} tone={statusTone} />
               <StatusTile icon={Database} label="Database" value={health?.services?.database || "Checking..."} sub={health?.databaseLatencyMs != null ? `${health.databaseLatencyMs} ms database ping` : "Prisma route check"} />
               <StatusTile icon={Clock} label="Server uptime" value={health ? formatUptime(health.uptimeSeconds) : "Checking..."} sub={`Booted ${formatDate(health?.serverStartedAt)}`} tone="yellow" />
-              <StatusTile icon={Power} label="App process" value={health?.processUptimeSeconds != null ? formatUptime(health.processUptimeSeconds) : "Checking..."} sub={`Started ${formatDate(health?.appStartedAt)}`} />
               <StatusTile icon={Activity} label="Response" value={health ? `${health.responseTimeMs} ms` : "Checking..."} sub={health?.timestamp ? `Updated ${formatDate(health.timestamp)}` : "Live API response"} />
             </div>
           )}
@@ -317,8 +315,8 @@ export default function AdminSystemPage() {
         {serviceRows.map(([name, desc, Icon, state]) => (
           <Card key={name}>
             <CardContent className="p-5">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+              <div className="flex items-center gap-3">
+                <div className="admin-icon-box h-10 w-10 rounded-xl border border-primary/20 bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">

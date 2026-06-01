@@ -91,7 +91,7 @@ export default function AdminDashboardPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-3">
-          <div className="rounded-2xl bg-primary/10 p-3">
+          <div className="admin-icon-box h-12 w-12 rounded-2xl bg-primary/10">
             {isSuperAdmin ? <Crown className="h-7 w-7 text-amber-500" /> : <ShieldCheck className="h-7 w-7 text-primary" />}
           </div>
           <div>
@@ -120,13 +120,13 @@ export default function AdminDashboardPage() {
       <div className={`grid gap-4 ${isSuperAdmin ? "grid-cols-2 xl:grid-cols-4" : "grid-cols-2 xl:grid-cols-5"}`}>
         {statsToShow.map(([label, value, sub, Icon]: any) => (
           <Card key={label}><CardContent className="p-5">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs text-muted-foreground">{label}</p>
                 <p className="mt-1 text-2xl font-bold">{value}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{sub}</p>
               </div>
-              <div className="rounded-xl bg-primary/10 p-2"><Icon className="h-5 w-5 text-primary" /></div>
+              <div className="admin-icon-box h-11 w-11 rounded-xl bg-primary/10"><Icon className="h-5 w-5 text-primary" /></div>
             </div>
           </CardContent></Card>
         ))}
@@ -139,8 +139,8 @@ export default function AdminDashboardPage() {
             <Card className="h-full hover:border-primary/50 hover:bg-muted/20 transition-colors">
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="rounded-xl bg-primary/10 p-2"><p.icon className="h-5 w-5 text-primary" /></div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  <div className="admin-icon-box h-11 w-11 rounded-xl bg-primary/10"><p.icon className="h-5 w-5 text-primary" /></div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                 </div>
                 <div><h3 className="font-semibold">{p.title}</h3><p className="mt-1 text-xs text-muted-foreground leading-relaxed">{p.desc}</p></div>
               </CardContent>
