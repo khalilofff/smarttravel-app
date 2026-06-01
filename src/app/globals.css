@@ -174,6 +174,17 @@
   .mobile-landing-nav { height: auto !important; min-height: 4.5rem; padding-top: .75rem; padding-bottom: .75rem; align-items: center; }
   .mobile-landing-brand-subtitle { display: none !important; }
   .mobile-landing-actions a { padding-left: .85rem !important; padding-right: .85rem !important; font-size: .85rem !important; }
+
+  .mobile-wrap,
+  .mobile-wrap * {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .card-hover {
+    transform: none !important;
+  }
 }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -287,61 +298,31 @@ input[type="date"] { color-scheme: light; }
   }
 }
 
-/* SmartTravel presentation polish: scoped fixes only. Do not shrink dashboard pages globally. */
-.smart-date-input {
-  color: hsl(var(--foreground)) !important;
-  background-color: hsl(var(--background)) !important;
-  color-scheme: dark;
-}
-.smart-date-input::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.85;
-}
-
+/* SmartTravel presentation polish: scoped only to public/auth pages so dashboard sizing is independent. */
 @media (max-width: 768px) {
-  main:not(.landing-page), .container { overflow-x: hidden; }
-  table { min-width: 640px; }
-  button, a, input, select, textarea { min-width: 0; }
-
-  .landing-page,
-  .landing-page * {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
-
-  .landing-header {
-    align-items: center;
-  }
-
-  .landing-brand-subtitle {
-    display: none !important;
-  }
-
-  .landing-actions a {
-    white-space: nowrap;
-    padding-left: 0.8rem !important;
-    padding-right: 0.8rem !important;
-    font-size: 0.85rem !important;
-  }
+  .landing-shell, .auth-shell { overflow-x: hidden; }
+  .landing-shell .grid, .auth-shell .grid { min-width: 0; }
+  .landing-shell button,
+  .landing-shell a,
+  .landing-shell input,
+  .landing-shell select,
+  .landing-shell textarea,
+  .auth-shell button,
+  .auth-shell a,
+  .auth-shell input,
+  .auth-shell select,
+  .auth-shell textarea { min-width: 0; }
 }
 
-@media (max-width: 420px) {
-  .landing-header {
-    gap: 0.75rem;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-  .landing-brand {
-    max-width: 44%;
-  }
-  .landing-actions {
-    gap: 0.35rem;
-  }
-  .landing-actions a {
-    border-radius: 0.9rem !important;
-    padding-left: 0.65rem !important;
-    padding-right: 0.65rem !important;
-  }
+@media (max-width: 640px) {
+  .landing-shell .landing-hero { min-height: auto; }
+  .landing-shell .landing-brand { max-width: 48vw; }
+  .landing-shell .landing-actions { max-width: 52vw; }
+  .landing-shell .landing-actions a { line-height: 1rem; }
+  .landing-shell h1 { font-size: clamp(2.35rem, 13vw, 3.6rem); line-height: .95; }
+  .landing-shell h2 { font-size: clamp(1.55rem, 7vw, 2.25rem); line-height: 1.05; }
+  .landing-shell .rounded-\[2rem\] { border-radius: 1.35rem; }
+  .auth-shell h1 { font-size: 2.25rem; line-height: 2.55rem; }
 }
 
 
@@ -361,160 +342,310 @@ input[type="date"] { color-scheme: light; }
   }
 }
 
-/* SmartTravel mobile date/input polish */
-.smart-date-field {
-  width: 100%;
-}
-.smart-date-input {
-  min-height: 48px !important;
-  height: 48px !important;
-  line-height: 48px !important;
-  color: hsl(var(--foreground)) !important;
-}
-.smart-date-input::-webkit-date-and-time-value {
-  text-align: left;
-  min-height: 48px;
-  line-height: 48px;
-}
-.smart-date-input::-webkit-calendar-picker-indicator {
-  opacity: .85;
-}
 
-@media (max-width: 640px) {
-  .smart-date-input {
-    font-size: 16px !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
-
-  .smart-date-input:invalid,
-  .smart-date-input[value=""] {
-    color: transparent !important;
-  }
-}
-
-/* landing-mobile-fix-v2: scoped only to public landing page */
-@media (max-width: 640px) {
-  .landing-page .landing-header {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-    gap: .75rem !important;
-  }
-  .landing-page .landing-brand {
-    max-width: 48%;
-  }
-  .landing-page .landing-actions {
-    max-width: 52%;
-  }
-  .landing-page .landing-actions a {
-    white-space: nowrap;
-    padding-left: .75rem !important;
-    padding-right: .75rem !important;
-    font-size: .78rem !important;
-  }
-  .landing-page h1 {
-    overflow-wrap: normal;
-    word-break: normal;
-  }
-}
-
-
-/* Final planner date input fix: use text-like stable boxes so mobile Safari/Chrome cannot stretch native date UI outside the card. */
-.smart-date-input,
-.smart-date-input input {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
-}
-.smart-date-input {
-  height: 48px !important;
-  min-height: 48px !important;
-  line-height: 1.25 !important;
-  text-align: left !important;
-  color: hsl(var(--foreground)) !important;
-  background-color: hsl(var(--background)) !important;
-}
-.smart-date-input::placeholder {
-  color: hsl(var(--muted-foreground)) !important;
-  opacity: 1 !important;
-}
-@media (max-width: 640px) {
-  .smart-date-input {
-    display: block !important;
-    height: 48px !important;
-    min-height: 48px !important;
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-    font-size: 16px !important;
-    border-radius: 14px !important;
-  }
-}
-
-
-/* Native date picker with custom stable visual shell. Keeps real calendar picker, prevents mobile overflow. */
-.smart-date-shell {
-  position: relative;
-  width: 100%;
-  height: 48px;
-  min-height: 48px;
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-  border-radius: 14px;
-  border: 1px solid hsl(var(--input));
-  background: hsl(var(--background));
+/* Native date inputs: keep day/month/year numbers and calendar icon visible on dark mobile forms. */
+input[type="date"] {
   color: hsl(var(--foreground));
-  box-sizing: border-box;
-  overflow: hidden;
-}
-.smart-date-shell:focus-within {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-}
-.smart-date-value,
-.smart-date-placeholder {
-  display: block;
-  width: 100%;
+  background-color: hsl(var(--background));
   min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: 16px;
-  line-height: 1;
-  pointer-events: none;
+  color-scheme: light dark;
 }
-.smart-date-placeholder {
+.dark input[type="date"] {
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--background));
+  color-scheme: dark;
+}
+input[type="date"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: currentColor;
+  opacity: 1;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: .9;
+  cursor: pointer;
+}
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+input[type="date"].smart-date-empty::-webkit-datetime-edit {
   color: hsl(var(--muted-foreground));
 }
-.smart-date-native {
-  position: absolute;
-  inset: 0;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  opacity: 0;
-  cursor: pointer;
-  border: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-}
-.smart-date-disabled {
-  opacity: 0.55;
-}
-.smart-date-disabled .smart-date-native {
-  cursor: not-allowed;
-}
+
+/* SmartTravel mobile comfort pass: keeps public landing and dashboard responsive without cross-breaking layouts. */
 @media (max-width: 640px) {
-  .smart-date-shell {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 48px !important;
-    min-height: 48px !important;
-    border-radius: 14px !important;
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .landing-shell {
+    font-size: 16px;
+  }
+
+  .landing-shell h1,
+  .landing-shell h2,
+  .landing-shell h3,
+  .landing-shell p,
+  .landing-shell a,
+  .landing-shell span {
+    overflow-wrap: anywhere;
+  }
+
+  .landing-shell a,
+  .landing-shell button {
+    min-height: 44px;
+  }
+
+  .mobile-page-pad {
+    padding: 0.75rem !important;
+    padding-bottom: 5.5rem !important;
+  }
+
+  .mobile-page-pad h1 {
+    font-size: 1.65rem !important;
+    line-height: 2rem !important;
+    letter-spacing: -0.03em;
+  }
+
+  .mobile-page-pad h2,
+  .mobile-page-pad h3 {
+    line-height: 1.25 !important;
+  }
+
+  .mobile-page-pad [class*="grid"] {
+    min-width: 0;
+  }
+
+  .mobile-page-pad .rounded-2xl,
+  .mobile-page-pad .rounded-3xl {
+    border-radius: 1rem !important;
+  }
+
+  .mobile-page-pad .p-12 {
+    padding: 1.5rem !important;
+  }
+
+  .mobile-page-pad .p-6,
+  .mobile-page-pad .p-5 {
+    padding: 1rem !important;
+  }
+
+  .mobile-page-pad .p-4 {
+    padding: 0.9rem !important;
+  }
+
+  .mobile-page-pad input,
+  .mobile-page-pad select,
+  .mobile-page-pad textarea,
+  .mobile-page-pad button {
+    font-size: 16px !important;
+  }
+
+  .mobile-page-pad input,
+  .mobile-page-pad select {
+    min-height: 48px;
+  }
+
+  .mobile-page-pad button,
+  .mobile-page-pad a[role="button"] {
+    min-height: 44px;
+  }
+
+  .mobile-page-pad .sticky {
+    position: static !important;
+  }
+
+  .mobile-page-pad .text-right {
+    text-align: left !important;
+  }
+
+  .mobile-page-pad .mobile-wrap,
+  .mobile-page-pad .break-words {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .mobile-page-pad table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .dashboard-mobile-bottom-nav {
+    display: grid !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .dashboard-mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
+/* Mobile density pass: result cards, flight tickets and hotel cards use less vertical space on phones. */
+@media (max-width: 640px) {
+  .mobile-page-pad {
+    font-size: 0.875rem;
+  }
+
+  .mobile-page-pad .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1rem !important;
+  }
+
+  .mobile-page-pad .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.75rem !important;
+  }
+
+  .mobile-page-pad .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.55rem !important;
+  }
+
+  .mobile-page-pad .gap-4 { gap: 0.75rem !important; }
+  .mobile-page-pad .gap-3 { gap: 0.55rem !important; }
+  .mobile-page-pad .gap-2 { gap: 0.4rem !important; }
+
+  .mobile-page-pad [class*="text-3xl"] {
+    font-size: 1.5rem !important;
+    line-height: 1.85rem !important;
+  }
+
+  .mobile-page-pad [class*="text-2xl"] {
+    font-size: 1.25rem !important;
+    line-height: 1.55rem !important;
+  }
+
+  .mobile-page-pad .text-xl {
+    font-size: 1.05rem !important;
+    line-height: 1.35rem !important;
+  }
+
+  .mobile-page-pad .text-lg {
+    font-size: 0.98rem !important;
+    line-height: 1.3rem !important;
+  }
+
+  .mobile-page-pad .text-base {
+    font-size: 0.9rem !important;
+    line-height: 1.25rem !important;
+  }
+
+  .mobile-page-pad .text-sm {
+    font-size: 0.8rem !important;
+    line-height: 1.15rem !important;
+  }
+
+  .mobile-page-pad .text-xs {
+    font-size: 0.7rem !important;
+    line-height: 1rem !important;
+  }
+
+  .mobile-page-pad .font-bold.text-xl,
+  .mobile-page-pad p.font-bold {
+    font-size: 1.05rem !important;
+    line-height: 1.25rem !important;
+  }
+
+  .mobile-page-pad [class*="p-6"],
+  .mobile-page-pad [class*="p-5"] {
+    padding: 0.75rem !important;
+  }
+
+  .mobile-page-pad [class*="p-4"] {
+    padding: 0.65rem !important;
+  }
+
+  .mobile-page-pad [class*="mt-4"] { margin-top: 0.65rem !important; }
+  .mobile-page-pad [class*="mt-3"] { margin-top: 0.5rem !important; }
+  .mobile-page-pad [class*="mt-2"] { margin-top: 0.35rem !important; }
+
+  .mobile-page-pad .rounded-2xl,
+  .mobile-page-pad .rounded-xl {
+    border-radius: 0.85rem !important;
+  }
+
+  .mobile-page-pad .rounded-3xl {
+    border-radius: 1rem !important;
+  }
+
+  .mobile-page-pad .badge,
+  .mobile-page-pad [class*="rounded-full"] {
+    max-width: 100%;
+  }
+
+  .mobile-page-pad button,
+  .mobile-page-pad a[role="button"] {
+    min-height: 38px !important;
+    padding-top: 0.45rem !important;
+    padding-bottom: 0.45rem !important;
+  }
+
+  .mobile-page-pad input,
+  .mobile-page-pad select {
+    min-height: 42px !important;
+    height: 42px !important;
+  }
+
+  .mobile-result-card {
+    padding: 0.7rem !important;
+    gap: 0.6rem !important;
+  }
+
+  .mobile-result-card .mobile-result-title {
+    font-size: 0.95rem !important;
+    line-height: 1.2rem !important;
+  }
+
+  .mobile-segment-card {
+    padding: 0.55rem !important;
+  }
+
+  .mobile-segment-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 0.35rem 0.55rem !important;
+  }
+
+  .mobile-segment-grid p {
+    min-width: 0;
+    font-size: 0.72rem !important;
+    line-height: 1rem !important;
+  }
+
+  .mobile-price-box {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    align-items: center;
+    gap: 0.45rem;
+    text-align: left !important;
+    width: 100%;
+  }
+
+  .mobile-price-box p {
+    margin: 0 !important;
+  }
+
+  .mobile-action-row {
+    gap: 0.5rem !important;
+  }
+
+  .mobile-action-row button {
+    font-size: 0.78rem !important;
+  }
+
+  .mobile-hotel-image {
+    min-height: 6.5rem !important;
+  }
+
+  .mobile-hotel-image img {
+    height: 6.5rem !important;
   }
 }
