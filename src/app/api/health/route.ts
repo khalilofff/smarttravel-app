@@ -1,22 +1,65 @@
 import { NextResponse } from "next/server";
+import prisma from "@/lib/db";
 
 export const runtime = "nodejs";
 
+type ServiceState = "running" | "connected" | "degraded" | "error" | "not-configured";
+
+function formatServiceState(value: ServiceState) {
+  return value;
+}
+
 export async function GET() {
+  const startedAt = Date.now();
+  const uptimeSeconds = Math.max(0, Math.floor(process.uptime()));
+  const serverStartedAt = new Date(Date.now() - uptimeSeconds * 1000).toISOString();
+
+  let database: ServiceState = "connected";
+  let databaseLatencyMs: number | null = null;
+  let counts = {
+    users: 0,
+    trips: 0,
+    bookings: 0,
+    notifications: 0,
+  };
+
+  try {
+    const dbStartedAt = Date.now();
+    await prisma.$queryRaw`SELECT 1`;
+    databaseLatencyMs = Date.now() - dbStartedAt;
+    const [users, trips, bookings, notifications] = await Promise.all([
+      prisma.user.count(),
+      prisma.trip.count(),
+      prisma.booking.count(),
+      prisma.notification.count(),
+    ]);
+    counts = { users, trips, bookings, notifications };
+  } catch {
+    database = "error";
+  }
+
+  const responseTimeMs = Math.max(1, Date.now() - startedAt);
+  const appStatus = database === "error" ? "degraded" : "ok";
+
   return NextResponse.json({
-    status: "ok",
-    mode: "local-demo",
+    status: appStatus,
+    mode: process.env.NODE_ENV || "development",
     app: "SmartTravel",
     timestamp: new Date().toISOString(),
-    uptimeSeconds: Math.floor(process.uptime()),
+    serverStartedAt,
+    uptimeSeconds,
+    responseTimeMs,
+    databaseLatencyMs,
+    nodeVersion: process.version,
     services: {
-      app: "running",
-      database: "checked-by-prisma-routes",
-      email: "auto-verified-local-register",
+      app: formatServiceState("running"),
+      database,
+      email: process.env.SMTP_HOST ? formatServiceState("connected") : formatServiceState("not-configured"),
       bookingMode: "external-provider-redirects",
       aiPlanner: "local-ollama-or-fallback",
       uploads: "local-filesystem",
     },
-    setupHint: "If database routes fail, run `npm run repair` or `npm run setup1` to regenerate Prisma and sync SQLite.",
+    counts,
+    setupHint: database === "error" ? "Database check failed. Run `npx prisma generate` and `npx prisma db push`." : "All core status checks completed.",
   });
 }

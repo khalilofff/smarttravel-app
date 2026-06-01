@@ -1,24 +1,110 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from "@/components/ui";
-import { Activity, Database, ShieldCheck, Server, Clock, RefreshCw, Plane, Hotel, MapPin, Bell, CheckCircle2 } from "lucide-react";
+import {
+  Activity,
+  Database,
+  ShieldCheck,
+  Server,
+  Clock,
+  RefreshCw,
+  Plane,
+  Hotel,
+  MapPin,
+  Bell,
+  CheckCircle2,
+  Mail,
+  HardDrive,
+  Bot,
+  ExternalLink,
+  Power,
+} from "lucide-react";
 
 type HealthData = {
-  status: "ok" | "error";
+  status: "ok" | "degraded" | "error";
   uptimeSeconds: number;
   responseTimeMs: number;
+  databaseLatencyMs?: number | null;
+  serverStartedAt?: string;
+  nodeVersion?: string;
+  mode?: string;
   services: Record<string, string>;
   counts?: { users: number; trips: number; bookings: number; notifications: number };
+  timestamp?: string;
 };
 
 function formatUptime(seconds = 0) {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
   if (days) return `${days}d ${hours}h ${minutes}m`;
-  if (hours) return `${hours}h ${minutes}m`;
-  return `${minutes}m ${seconds % 60}s`;
+  if (hours) return `${hours}h ${minutes}m ${secs}s`;
+  if (minutes) return `${minutes}m ${secs}s`;
+  return `${secs}s`;
+}
+
+function formatDate(value?: string) {
+  if (!value) return "Checking...";
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
+function statusBadge(status?: string) {
+  const normalized = (status || "checking").toLowerCase();
+  if (["ok", "running", "connected", "external-provider-redirects", "local-filesystem"].includes(normalized)) {
+    return <Badge variant="success">Running</Badge>;
+  }
+  if (["degraded", "not-configured", "local-ollama-or-fallback"].includes(normalized)) {
+    return <Badge variant="warning">Limited</Badge>;
+  }
+  if (normalized === "error") return <Badge variant="destructive">Error</Badge>;
+  return <Badge variant="outline">Checking</Badge>;
+}
+
+function StatusTile({
+  icon: Icon,
+  label,
+  value,
+  sub,
+  tone = "primary",
+}: {
+  icon: any;
+  label: string;
+  value: string;
+  sub?: string;
+  tone?: "primary" | "green" | "yellow" | "red";
+}) {
+  const toneClass = {
+    primary: "bg-primary/10 text-primary border-primary/20",
+    green: "bg-green-500/10 text-green-400 border-green-500/20",
+    yellow: "bg-yellow-500/10 text-yellow-300 border-yellow-500/20",
+    red: "bg-red-500/10 text-red-300 border-red-500/20",
+  }[tone];
+
+  return (
+    <div className="rounded-2xl border border-border bg-card/80 p-4">
+      <div className="flex items-start gap-3">
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${toneClass}`}>
+          <Icon className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+          <p className="mt-1 truncate text-lg font-semibold">{value}</p>
+          {sub ? <p className="mt-1 text-xs text-muted-foreground">{sub}</p> : null}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function AdminSystemPage() {
@@ -31,7 +117,7 @@ export default function AdminSystemPage() {
   const loadHealth = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/health", { cache: "no-store" });
+      const res = await fetch(`/api/health?t=${Date.now()}`, { cache: "no-store" });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Health check failed");
       setHealth(json);
@@ -44,6 +130,9 @@ export default function AdminSystemPage() {
     }
   };
 
+  const hardRefresh = () => {
+    window.location.reload();
+  };
 
   const flightProviders = [
     { value: "AUTO", title: "Auto", desc: "SerpApi #3 → #2 → #1 → SearchApi → Duffel" },
@@ -79,37 +168,88 @@ export default function AdminSystemPage() {
   useEffect(() => {
     loadHealth();
     loadFlightProvider();
-    const timer = window.setInterval(loadHealth, 30000);
+    const timer = window.setInterval(loadHealth, 15000);
     return () => window.clearInterval(timer);
   }, []);
 
-  const serviceRows = [
-    ["Flight search", "SerpApi / SearchApi / Duffel provider flow", Plane],
-    ["Hotels", "Live provider results when configured", Hotel],
-    ["Places & restaurants", "Live place data and external map redirects", MapPin],
-    ["Notifications", "In-app notifications only", Bell],
-  ] as const;
+  const statusTone = health?.status === "ok" ? "green" : health?.status === "degraded" ? "yellow" : "red";
+
+  const serviceRows = useMemo(
+    () => [
+      ["Flight search", "Provider fallback flow is enabled.", Plane, health?.services?.bookingMode || "checking"],
+      ["Hotels", "Live hotel provider results when configured.", Hotel, "running"],
+      ["Places & restaurants", "External map redirects and city data.", MapPin, "running"],
+      ["Notifications", "In-app notification system.", Bell, "running"],
+      ["Email", "SMTP status for reset and verification.", Mail, health?.services?.email || "checking"],
+      ["AI planner", "Local Ollama or fallback planning flow.", Bot, health?.services?.aiPlanner || "checking"],
+      ["Uploads", "Profile images and local files.", HardDrive, health?.services?.uploads || "checking"],
+      ["External links", "Bookings redirect to providers.", ExternalLink, "running"],
+    ] as const,
+    [health]
+  );
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Database className="h-7 w-7 text-primary" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+            <Database className="h-6 w-6" />
+          </div>
           <div>
             <h1 className="text-3xl font-bold font-display">System Status</h1>
-            <p className="text-sm text-muted-foreground">Read-only platform status for the presentation build.</p>
+            <p className="text-sm text-muted-foreground">Real server, database and provider status for SmartTravel.</p>
           </div>
         </div>
-        <Button variant="outline" onClick={loadHealth} disabled={loading} className="gap-2"><RefreshCw className="h-4 w-4" /> Refresh</Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" onClick={loadHealth} disabled={loading} className="gap-2">
+            <Activity className={`h-4 w-4 ${loading ? "animate-pulse" : ""}`} />
+            Check status
+          </Button>
+          <Button onClick={hardRefresh} className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            F5 Refresh
+          </Button>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">
-        <Card><CardContent className="p-5"><ShieldCheck className="h-6 w-6 text-green-500 mb-3" /><h3 className="font-semibold">Presentation Safe</h3><p className="text-sm text-muted-foreground mt-1">The admin UI shows only safe live status information for the presentation build.</p><Badge variant="success" className="mt-3">Locked</Badge></CardContent></Card>
-        <Card><CardContent className="p-5"><Database className="h-6 w-6 text-primary mb-3" /><h3 className="font-semibold">Database</h3><p className="text-sm text-muted-foreground mt-1">Local Prisma database is used for demo users, trips, bookings and activity.</p><Badge className="mt-3">Prisma</Badge></CardContent></Card>
-        <Card><CardContent className="p-5"><Server className="h-6 w-6 text-primary mb-3" /><h3 className="font-semibold">Runtime</h3><p className="text-sm text-muted-foreground mt-1">SmartTravel shows real provider options and redirects users to external booking pages. It does not sell tickets.</p><Badge className="mt-3">Local AI</Badge></CardContent></Card>
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="h-6 w-6 shrink-0 text-green-500" />
+              <div>
+                <h3 className="font-semibold">Presentation Safe</h3>
+                <p className="mt-1 text-sm text-muted-foreground">The admin UI shows safe live status information for the presentation build.</p>
+                <Badge variant="success" className="mt-3">Locked</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-start gap-3">
+              <Database className="h-6 w-6 shrink-0 text-primary" />
+              <div>
+                <h3 className="font-semibold">Database</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Prisma is checked through a real server route, not static text.</p>
+                <div className="mt-3">{statusBadge(health?.services?.database)}</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-start gap-3">
+              <Server className="h-6 w-6 shrink-0 text-primary" />
+              <div>
+                <h3 className="font-semibold">Runtime</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Current Node runtime and deployed server process information.</p>
+                <Badge className="mt-3">{health?.mode || "Checking"}</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-
-
 
       <Card>
         <CardHeader>
@@ -129,7 +269,7 @@ export default function AdminSystemPage() {
                   className={`rounded-2xl border p-4 text-left transition-colors ${active ? "border-primary bg-primary/10" : "bg-card hover:bg-muted/40"}`}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div>
+                    <div className="min-w-0">
                       <p className="font-semibold">{provider.title}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{provider.desc}</p>
                     </div>
@@ -151,19 +291,41 @@ export default function AdminSystemPage() {
           {healthError ? (
             <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">{healthError}</div>
           ) : (
-            <div className="grid md:grid-cols-4 gap-4">
-              <div className="rounded-xl border border-border bg-muted/30 p-4"><Server className="h-5 w-5 text-green-500 mb-2" /><p className="text-xs text-muted-foreground">Server</p><p className="font-semibold">{health?.status === "ok" ? "Running" : "Checking..."}</p></div>
-              <div className="rounded-xl border border-border bg-muted/30 p-4"><Database className="h-5 w-5 text-primary mb-2" /><p className="text-xs text-muted-foreground">Database</p><p className="font-semibold">{health?.services?.database || "Checking..."}</p></div>
-              <div className="rounded-xl border border-border bg-muted/30 p-4"><Clock className="h-5 w-5 text-yellow-500 mb-2" /><p className="text-xs text-muted-foreground">Uptime</p><p className="font-semibold">{health ? formatUptime(health.uptimeSeconds) : "Checking..."}</p></div>
-              <div className="rounded-xl border border-border bg-muted/30 p-4"><Activity className="h-5 w-5 text-primary mb-2" /><p className="text-xs text-muted-foreground">Response</p><p className="font-semibold">{health ? `${health.responseTimeMs} ms` : "Checking..."}</p></div>
+            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+              <StatusTile icon={Power} label="Server" value={health?.status === "ok" ? "Running" : health?.status === "degraded" ? "Limited" : "Checking..."} sub={health?.nodeVersion || "Node runtime"} tone={statusTone} />
+              <StatusTile icon={Database} label="Database" value={health?.services?.database || "Checking..."} sub={health?.databaseLatencyMs != null ? `${health.databaseLatencyMs} ms database ping` : "Prisma route check"} />
+              <StatusTile icon={Clock} label="Uptime" value={health ? formatUptime(health.uptimeSeconds) : "Checking..."} sub={`Started ${formatDate(health?.serverStartedAt)}`} tone="yellow" />
+              <StatusTile icon={Activity} label="Response" value={health ? `${health.responseTimeMs} ms` : "Checking..."} sub={health?.timestamp ? `Updated ${formatDate(health.timestamp)}` : "Live API response"} />
             </div>
           )}
         </CardContent>
       </Card>
 
+      {health?.counts ? (
+        <div className="grid md:grid-cols-4 gap-4">
+          <StatusTile icon={Database} label="Users" value={String(health.counts.users)} sub="Total accounts" />
+          <StatusTile icon={Plane} label="Trips" value={String(health.counts.trips)} sub="Saved trips" />
+          <StatusTile icon={ExternalLink} label="Bookings" value={String(health.counts.bookings)} sub="Saved booking records" />
+          <StatusTile icon={Bell} label="Notifications" value={String(health.counts.notifications)} sub="In-app records" />
+        </div>
+      ) : null}
+
       <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-        {serviceRows.map(([name, desc, Icon]) => (
-          <Card key={name}><CardContent className="p-5"><Icon className="h-5 w-5 text-primary mb-3" /><h3 className="font-semibold">{name}</h3><p className="text-sm text-muted-foreground mt-1">{desc}</p></CardContent></Card>
+        {serviceRows.map(([name, desc, Icon, state]) => (
+          <Card key={name}>
+            <CardContent className="p-5">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold">{name}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
+                  <div className="mt-3">{statusBadge(state)}</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
