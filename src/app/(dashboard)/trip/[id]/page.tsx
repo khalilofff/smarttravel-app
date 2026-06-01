@@ -394,11 +394,11 @@ export default function TripDetailPage() {
             <EmptyState icon={Sparkles} title="No itinerary yet" description="Generate an AI-powered itinerary!" action={isEditor ? <Button onClick={generateItinerary} loading={generating}>Generate Itinerary</Button> : undefined} />
           ) : (
             trip.itinerary.days.map((day: any) => (
-              <Card key={day.id}>
-                <CardHeader className="pb-3">
+              <Card key={day.id} className="mobile-trip-day-card">
+                <CardHeader className="pb-2 sm:pb-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-base">Day {day.dayNumber}: {day.title}</CardTitle>
+                      <CardTitle className="text-base mobile-day-title">Day {day.dayNumber}: {day.title}</CardTitle>
                       <p className="text-xs text-muted-foreground mt-0.5">{formatDate(day.date)} · Est. {formatCurrency(day.dailyCost, trip.currency)}</p>
                     </div>
                     {/* #20 Add Item */}
@@ -411,8 +411,8 @@ export default function TripDetailPage() {
                     const downvotes = item.votes?.filter((v: any) => v.value === -1).length || 0;
                     const tags = typeof item.tags === "string" ? JSON.parse(item.tags || "[]") : (item.tags || []);
                     return (
-                      <div key={item.id} className={`p-4 rounded-xl border transition-colors ${item.status === "DONE" ? "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900" : item.status === "SKIPPED" ? "opacity-50" : "hover:bg-muted/50"}`}>
-                        <div className="flex items-start gap-3">
+                      <div key={item.id} className={`mobile-itinerary-item p-4 rounded-xl border transition-colors ${item.status === "DONE" ? "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900" : item.status === "SKIPPED" ? "opacity-50" : "hover:bg-muted/50"}`}>
+                        <div className="mobile-itinerary-inner flex items-start gap-3">
                           {/* #21 Reorder */}
                           {isEditor && (
                             <div className="flex flex-col gap-0.5 mt-1">
@@ -427,8 +427,8 @@ export default function TripDetailPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <div>
-                                <h4 className="font-medium">{item.title}</h4>
-                                <p className="text-sm text-muted-foreground mt-0.5">{item.description}</p>
+                                <h4 className="font-medium mobile-line-clamp-2">{item.title}</h4>
+                                <p className="text-sm text-muted-foreground mt-0.5 mobile-line-clamp-3">{item.description}</p>
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
                                 <span className="text-sm font-semibold">{formatCurrency(item.estimatedCost, trip.currency)}</span>
@@ -528,14 +528,14 @@ export default function TripDetailPage() {
           {(!trip.bookings || trip.bookings.length === 0) ? (
             <EmptyState icon={BookOpen} title="No bookings" description="Add your reservations." action={isEditor ? <Button onClick={() => setShowBookingForm(true)}>Add Booking</Button> : undefined} />
           ) : (
-            <div className="grid sm:grid-cols-2 gap-3">
+            <div className="grid sm:grid-cols-2 gap-3 mobile-booking-grid">
               {trip.bookings.map((b: any) => (
-                <Card key={b.id}><CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div>
+                <Card key={b.id} className="mobile-booking-card"><CardContent className="p-4">
+                  <div className="mobile-booking-row flex items-start justify-between gap-2 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <Badge variant="secondary" className="mb-2 text-[10px]">{b.type}</Badge>
-                      <h4 className="font-medium">{b.provider}</h4>
-                      {b.bookingRef && <p className="text-xs text-muted-foreground">Ref: {b.bookingRef}</p>}
+                      <h4 className="font-medium mobile-line-clamp-2 break-words">{b.provider}</h4>
+                      {b.bookingRef && <p className="text-xs text-muted-foreground break-all">Ref: {b.bookingRef}</p>}
                       {b.checkIn && <p className="text-xs text-muted-foreground">{formatDate(b.checkIn)}{b.checkOut ? ` – ${formatDate(b.checkOut)}` : ""}</p>}
                     </div>
                     <div className="flex items-center gap-1">

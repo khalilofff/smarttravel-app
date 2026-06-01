@@ -100,6 +100,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
+    document.body.classList.toggle("mobile-menu-open", mobileOpen);
+    return () => document.body.classList.remove("mobile-menu-open");
+  }, [mobileOpen]);
+
+  useEffect(() => {
     if (!user?.id) return;
     let cancelled = false;
     const loadHeaderData = async () => {
@@ -148,7 +153,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex h-[100dvh] w-full max-w-full overflow-hidden bg-background text-foreground" suppressHydrationWarning>
-      {mobileOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setMobileOpen(false)} />}
+      {mobileOpen && <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-[2px] lg:hidden" onClick={() => setMobileOpen(false)} />}
 
       <aside suppressHydrationWarning className={cn(
         "fixed lg:relative z-50 flex flex-col h-full bg-sidebar text-sidebar-foreground transition-all duration-150 border-r border-border shadow-xl backdrop-blur-xl",
@@ -309,6 +314,24 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <div className="flex-1 overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_80%_0%,rgba(128,171,171,0.16),transparent_34rem)]">
           <div className="mobile-page-pad p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto w-full min-w-0">{children}</div>
         </div>
+
+        <nav className="dashboard-mobile-bottom-nav fixed bottom-0 left-0 right-0 z-30 hidden grid-cols-4 border-t border-border bg-card/95 px-2 pb-[env(safe-area-inset-bottom)] pt-2 shadow-2xl backdrop-blur-xl lg:hidden">
+          {[
+            { href: isAnyManager ? "/admin/dashboard" : "/dashboard", label: "Home", icon: LayoutDashboard },
+            { href: isAnyManager ? "/admin/trips" : "/planner", label: isAnyManager ? "Trips" : "Plan", icon: isAnyManager ? Plane : Sparkles },
+            { href: isAnyManager ? "/admin/bookings" : "/trips", label: isAnyManager ? "Books" : "Trips", icon: BookOpen },
+            { href: "/profile", label: "Profile", icon: Settings },
+          ].map((item) => {
+            const active = pathname === item.href || pathname.startsWith(item.href + "/");
+            const Icon = item.icon;
+            return (
+              <Link key={item.href} href={item.href} className={cn("flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-bold transition-colors", active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground")}>
+                <Icon className="h-5 w-5" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
       </main>
     </div>
   );

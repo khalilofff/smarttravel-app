@@ -137,10 +137,10 @@ export default function ProfilePage() {
     <div className="space-y-6 animate-fade-in max-w-2xl">
       <h1 className="text-2xl font-bold font-display">Profile & Settings</h1>
 
-      <Card>
+      <Card className="mobile-profile-card">
         <CardHeader><CardTitle className="flex items-center gap-2"><User className="h-5 w-5" /> Profile</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="mobile-profile-row flex items-center gap-4 mb-4 min-w-0">
             <div className="relative">
               <Avatar name={profile.name} image={avatarUrl || undefined} size="lg" />
               <button
@@ -153,7 +153,7 @@ export default function ProfilePage() {
               </button>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={uploadAvatar} />
             </div>
-            <div><p className="font-semibold">{profile.name}</p><p className="text-sm text-muted-foreground">{profile.email}</p>
+            <div className="min-w-0 flex-1"><p className="font-semibold truncate">{profile.name}</p><p className="text-sm text-muted-foreground truncate">{profile.email}</p>
               {avatarUrl && <button type="button" onClick={removeAvatar} className="mt-2 block text-xs text-red-500 hover:underline">Remove profile photo</button>}
               {user?.role === "SUPER_ADMIN" && <span className="text-xs text-amber-500 font-medium">Super Admin</span>}
               {user?.role === "MANAGER" && <span className="text-xs text-primary font-medium">Manager</span>}

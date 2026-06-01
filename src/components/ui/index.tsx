@@ -170,11 +170,12 @@ CardFooter.displayName = "CardFooter";
 function Avatar({ name, image, size = "md" }: { name?: string | null; image?: string | null; size?: "sm" | "md" | "lg" }) {
   const sizes = { sm: "h-8 w-8 text-xs", md: "h-10 w-10 text-sm", lg: "h-14 w-14 text-lg" };
   const initials = name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "??";
-  if (image) {
-    return <img src={image} alt={name || ""} className={cn("rounded-full object-cover", sizes[size])} />;
+  const [failed, setFailed] = React.useState(false);
+  if (image && !failed) {
+    return <img src={image} alt={name || ""} onError={() => setFailed(true)} className={cn("rounded-full object-cover shrink-0", sizes[size])} />;
   }
   return (
-    <div className={cn("rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold", sizes[size])}>
+    <div className={cn("rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold shrink-0", sizes[size])}>
       {initials}
     </div>
   );
@@ -244,16 +245,16 @@ function StatCard({ title, value, subtitle, icon: Icon, trend }: {
 function Dialog({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children?: ReactNode }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-2 sm:p-4">
       <div className="fixed inset-0 bg-black/55 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-50 w-full sm:max-w-lg max-h-[92dvh] sm:max-h-[86vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl bg-card border shadow-2xl animate-fade-in overscroll-contain mobile-dialog">
-        <div className="sticky top-0 z-10 flex items-center justify-between p-5 sm:p-6 border-b bg-card/95 backdrop-blur">
+      <div className="relative z-50 w-full sm:max-w-lg max-h-[88dvh] sm:max-h-[86vh] overflow-y-auto rounded-2xl sm:rounded-2xl bg-card border shadow-2xl animate-fade-in overscroll-contain mobile-dialog">
+        <div className="sticky top-0 z-10 flex items-center justify-between p-4 sm:p-6 border-b bg-card/95 backdrop-blur">
           <h2 className="text-lg font-semibold">{title}</h2>
           <button onClick={onClose} className="rounded-lg p-2 hover:bg-muted transition-colors" aria-label="Close dialog">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
-        <div className="p-5 sm:p-6">{children}</div>
+        <div className="p-4 sm:p-6">{children}</div>
       </div>
     </div>
   );

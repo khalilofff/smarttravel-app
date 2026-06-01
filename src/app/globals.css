@@ -649,3 +649,204 @@ input[type="date"].smart-date-empty::-webkit-datetime-edit {
     height: 6.5rem !important;
   }
 }
+
+/* Final mobile cleanup pass requested from phone screenshots. */
+@media (max-width: 640px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body.mobile-menu-open {
+    overflow: hidden !important;
+    touch-action: none;
+  }
+
+  .mobile-page-pad {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)) !important;
+  }
+
+  .dashboard-mobile-bottom-nav {
+    display: none !important;
+  }
+
+  .mobile-page-pad .mobile-hotel-card {
+    padding-bottom: 0.7rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  .mobile-page-pad .mobile-hotel-card .mobile-action-row {
+    margin-top: 0 !important;
+  }
+
+  .mobile-page-pad .mobile-hotel-card .mobile-action-row button {
+    min-height: 36px !important;
+    height: 36px !important;
+  }
+
+  .mobile-page-pad .mobile-hotel-card .mobile-segment-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  }
+
+  .mobile-page-pad .mobile-hotel-card .mobile-segment-grid p:nth-last-child(1) {
+    grid-column: 1 / -1;
+  }
+
+  .mobile-page-pad .mobile-hotel-card .text-xs.text-muted-foreground.mt-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 0.35rem !important;
+  }
+
+  .mobile-plan-chips {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .mobile-plan-chips button {
+    min-height: 54px !important;
+    padding: 0.5rem !important;
+  }
+
+  .mobile-plan-chips p {
+    font-size: 0.72rem !important;
+    line-height: 1rem !important;
+  }
+
+  .mobile-plan-chips p.font-bold {
+    font-size: 0.85rem !important;
+    line-height: 1.05rem !important;
+  }
+
+  .mobile-trip-day-card > div:first-child {
+    padding-bottom: 0.45rem !important;
+  }
+
+  .mobile-day-title {
+    font-size: 0.95rem !important;
+    line-height: 1.25rem !important;
+  }
+
+  .mobile-itinerary-item {
+    padding: 0.65rem !important;
+  }
+
+  .mobile-itinerary-inner {
+    gap: 0.5rem !important;
+  }
+
+  .mobile-itinerary-inner > div:nth-child(2) {
+    min-width: 4.8rem;
+    align-items: flex-start !important;
+  }
+
+  .mobile-itinerary-inner > div:nth-child(3) h4,
+  .mobile-itinerary-inner > div:nth-child(3) p {
+    overflow-wrap: anywhere;
+  }
+
+  .mobile-itinerary-item .text-sm.font-semibold {
+    font-size: 0.82rem !important;
+  }
+
+  .mobile-line-clamp-2,
+  .mobile-line-clamp-3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .mobile-line-clamp-2 { -webkit-line-clamp: 2; }
+  .mobile-line-clamp-3 { -webkit-line-clamp: 3; }
+
+  .mobile-booking-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0.65rem !important;
+  }
+
+  .mobile-booking-card > div {
+    padding: 0.75rem !important;
+  }
+
+  .mobile-booking-row {
+    align-items: flex-start !important;
+  }
+
+  .mobile-booking-card .rounded-full,
+  .mobile-booking-card [class*="rounded-full"] {
+    font-size: 0.65rem !important;
+    padding: 0.15rem 0.45rem !important;
+  }
+
+  .mobile-dialog {
+    width: calc(100vw - 1rem) !important;
+    max-height: min(86dvh, 620px) !important;
+    margin-bottom: calc(0.5rem + env(safe-area-inset-bottom)) !important;
+    border-radius: 1.1rem !important;
+  }
+
+  .mobile-dialog form {
+    gap: 0.65rem !important;
+  }
+
+  .mobile-dialog form .grid.grid-cols-2 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .mobile-dialog input,
+  .mobile-dialog select {
+    height: 42px !important;
+    min-height: 42px !important;
+    font-size: 16px !important;
+  }
+
+  .mobile-dialog .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.65rem !important;
+  }
+
+  .mobile-dialog .flex.gap-3.justify-end {
+    gap: 0.5rem !important;
+    justify-content: stretch !important;
+  }
+
+  .mobile-dialog .flex.gap-3.justify-end button {
+    flex: 1 1 0;
+  }
+
+  .mobile-profile-card > div {
+    overflow: hidden;
+  }
+
+  .mobile-profile-row {
+    align-items: center !important;
+    gap: 0.75rem !important;
+  }
+
+  .mobile-profile-row img,
+  .mobile-profile-row .h-14.w-14 {
+    height: 3.25rem !important;
+    width: 3.25rem !important;
+  }
+
+  .mobile-profile-row button.absolute {
+    right: -0.15rem !important;
+    bottom: -0.15rem !important;
+  }
+
+  .mobile-profile-row .text-sm {
+    max-width: 100%;
+  }
+
+  aside.fixed.lg\:relative {
+    width: min(82vw, 20rem) !important;
+    max-width: min(82vw, 20rem) !important;
+  }
+
+  body.mobile-menu-open main {
+    pointer-events: none;
+  }
+}
