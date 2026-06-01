@@ -417,3 +417,37 @@ input[type="date"] { color-scheme: light; }
     word-break: normal;
   }
 }
+
+
+/* Final planner date input fix: use text-like stable boxes so mobile Safari/Chrome cannot stretch native date UI outside the card. */
+.smart-date-input,
+.smart-date-input input {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+.smart-date-input {
+  height: 48px !important;
+  min-height: 48px !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  color: hsl(var(--foreground)) !important;
+  background-color: hsl(var(--background)) !important;
+}
+.smart-date-input::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 1 !important;
+}
+@media (max-width: 640px) {
+  .smart-date-input {
+    display: block !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    font-size: 16px !important;
+    border-radius: 14px !important;
+  }
+}
