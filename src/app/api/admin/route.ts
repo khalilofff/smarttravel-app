@@ -97,10 +97,11 @@ export async function GET(req: NextRequest) {
         prisma.trip.groupBy({ by: ["status"], _count: true }),
       ]);
 
-      const onlineCutoff = Date.now() - 2 * 60 * 1000;
+      const onlineCutoff = Date.now() - 45 * 1000;
       const recentUsersWithPresence = recentUsers.map((u) => ({
         ...u,
         isOnline: u.isActive && new Date(u.updatedAt).getTime() >= onlineCutoff,
+        presenceLabel: !u.isActive ? "Disabled" : (new Date(u.updatedAt).getTime() >= onlineCutoff ? "Active" : "Inactive"),
       }));
 
       return NextResponse.json({
@@ -126,18 +127,22 @@ export async function GET(req: NextRequest) {
       if (!isSuperAdmin) {
         where.role = "USER";
       }
-      return NextResponse.json(
-        await prisma.user.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          take: 100,
-          select: {
-            id: true, name: true, email: true, role: true, isActive: true,
-            emailVerified: true, twoFactorEnabled: true, createdAt: true,
-            _count: { select: { trips: true, bookings: true, expenses: true } },
-          },
-        })
-      );
+      const users = await prisma.user.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: 100,
+        select: {
+          id: true, name: true, email: true, role: true, isActive: true,
+          emailVerified: true, twoFactorEnabled: true, createdAt: true, updatedAt: true,
+          _count: { select: { trips: true, bookings: true, expenses: true } },
+        },
+      });
+      const onlineCutoff = Date.now() - 45 * 1000;
+      return NextResponse.json(users.map((u) => ({
+        ...u,
+        isOnline: u.isActive && new Date(u.updatedAt).getTime() >= onlineCutoff,
+        presenceLabel: !u.isActive ? "Disabled" : (new Date(u.updatedAt).getTime() >= onlineCutoff ? "Active" : "Inactive"),
+      })));
     }
 
 

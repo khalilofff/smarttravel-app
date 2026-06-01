@@ -111,14 +111,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       }
     };
     pingPresence();
-    const interval = window.setInterval(pingPresence, 30000);
+    const interval = window.setInterval(pingPresence, 15000);
     window.addEventListener("focus", pingPresence);
     document.addEventListener("visibilitychange", pingPresence);
+    const markOffline = () => {
+      try { fetch("/api/presence", { method: "DELETE", keepalive: true }); } catch {}
+    };
+    window.addEventListener("pagehide", markOffline);
     return () => {
       stopped = true;
       window.clearInterval(interval);
       window.removeEventListener("focus", pingPresence);
       document.removeEventListener("visibilitychange", pingPresence);
+      window.removeEventListener("pagehide", markOffline);
     };
   }, [user?.id]);
 

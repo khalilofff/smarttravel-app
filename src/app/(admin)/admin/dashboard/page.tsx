@@ -43,14 +43,20 @@ export default function AdminDashboardPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
-    setLoading(true);
-    const res = await fetch("/api/admin?type=stats");
+  const load = async (silent = false) => {
+    if (!silent) setLoading(true);
+    const res = await fetch("/api/admin?type=stats", { cache: "no-store" });
     if (res.ok) setData(await res.json());
-    setLoading(false);
+    if (!silent) setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    const refresh = () => load(true);
+    const interval = window.setInterval(refresh, 8000);
+    window.addEventListener("focus", refresh);
+    return () => { window.clearInterval(interval); window.removeEventListener("focus", refresh); };
+  }, []);
 
   if (loading) return <div className="flex justify-center py-24"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
@@ -157,9 +163,9 @@ export default function AdminDashboardPage() {
                 {!u.isActive ? (
                   <Badge variant="destructive" className="shrink-0 px-2 py-0.5 text-[10px]">Disabled</Badge>
                 ) : u.isOnline ? (
-                  <Badge variant="success" className="shrink-0 px-2 py-0.5 text-[10px]">Online</Badge>
+                  <Badge variant="success" className="shrink-0 px-2 py-0.5 text-[10px]">Active</Badge>
                 ) : (
-                  <Badge variant="secondary" className="shrink-0 px-2 py-0.5 text-[10px]">Offline</Badge>
+                  <Badge variant="secondary" className="shrink-0 px-2 py-0.5 text-[10px]">Inactive</Badge>
                 )}
               </div>
             ))}

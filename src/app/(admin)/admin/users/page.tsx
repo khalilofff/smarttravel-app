@@ -33,22 +33,29 @@ export default function AdminUsersPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const toggleSelected = (id: string) => setSelected((s) => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
 
-  const fetchUsers = async (q = search) => {
-    setLoading(true);
+  const fetchUsers = async (q = search, silent = false) => {
+    if (!silent) setLoading(true);
     try {
-      const res = await fetch(`/api/admin?type=users&search=${encodeURIComponent(q)}`);
+      const res = await fetch(`/api/admin?type=users&search=${encodeURIComponent(q)}`, { cache: "no-store" });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Users could not be loaded");
       setUsers(Array.isArray(data) ? data : []);
     } catch (e: any) {
-      toast.error(e.message || "Users could not be loaded");
-      setUsers([]);
+      if (!silent) toast.error(e.message || "Users could not be loaded");
+      if (!silent) setUsers([]);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => { fetchUsers(""); }, []);
+
+  useEffect(() => {
+    const refresh = () => fetchUsers(search, true);
+    const interval = window.setInterval(refresh, 10000);
+    window.addEventListener("focus", refresh);
+    return () => { window.clearInterval(interval); window.removeEventListener("focus", refresh); };
+  }, [search]);
 
   const runAction = async (userId: string, action: string) => {
     const res = await fetch("/api/admin", {
@@ -204,7 +211,13 @@ export default function AdminUsersPage() {
                           {u._count?.trips || 0} trips · {u._count?.bookings || 0} bookings · ${(u.budget?.balance || 0).toLocaleString()} budget
                         </td>
                         <td className="p-3">
-                          <Badge variant={u.isActive ? "success" : "destructive"}>{u.isActive ? "Active" : "Disabled"}</Badge>
+                          {!u.isActive ? (
+                            <Badge variant="destructive">Disabled</Badge>
+                          ) : u.isOnline ? (
+                            <Badge variant="success">Active</Badge>
+                          ) : (
+                            <Badge variant="secondary">Inactive</Badge>
+                          )}
                         </td>
                         <td className="p-3 text-muted-foreground">{formatDate(u.createdAt)}</td>
                         <td className="p-3 text-right">
