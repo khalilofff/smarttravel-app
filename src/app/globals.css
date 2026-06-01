@@ -360,3 +360,60 @@ input[type="date"] { color-scheme: light; }
     @apply ring-blue-400/40 shadow-lg shadow-blue-950/40;
   }
 }
+
+/* SmartTravel mobile date/input polish */
+.smart-date-field {
+  width: 100%;
+}
+.smart-date-input {
+  min-height: 48px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  color: hsl(var(--foreground)) !important;
+}
+.smart-date-input::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 48px;
+  line-height: 48px;
+}
+.smart-date-input::-webkit-calendar-picker-indicator {
+  opacity: .85;
+}
+
+@media (max-width: 640px) {
+  .smart-date-input {
+    font-size: 16px !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .smart-date-input:invalid,
+  .smart-date-input[value=""] {
+    color: transparent !important;
+  }
+}
+
+/* landing-mobile-fix-v2: scoped only to public landing page */
+@media (max-width: 640px) {
+  .landing-page .landing-header {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    gap: .75rem !important;
+  }
+  .landing-page .landing-brand {
+    max-width: 48%;
+  }
+  .landing-page .landing-actions {
+    max-width: 52%;
+  }
+  .landing-page .landing-actions a {
+    white-space: nowrap;
+    padding-left: .75rem !important;
+    padding-right: .75rem !important;
+    font-size: .78rem !important;
+  }
+  .landing-page h1 {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+}

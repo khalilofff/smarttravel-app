@@ -96,14 +96,14 @@ function AirportSearchBox({
   }, [query, setSelected]);
 
   return (
-    <div className="rounded-2xl border p-5 space-y-4 bg-card/60">
-      <div className="flex items-center justify-between gap-3">
-        <Label className="text-base">{title}</Label>
-        {selected ? <Badge variant="success">Live selected</Badge> : <Badge variant="outline">Live search</Badge>}
+    <div className="rounded-2xl border bg-card/60 p-4 space-y-3 sm:p-5 sm:space-y-4 mobile-wrap">
+      <div className="flex items-start justify-between gap-3">
+        <Label className="text-base leading-snug">{title}</Label>
+        {selected ? <Badge variant="success" className="shrink-0">Live selected</Badge> : <Badge variant="outline" className="shrink-0">Live search</Badge>}
       </div>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input className="h-12 pl-9" placeholder="Example: Baku, GYD, Istanbul, IST, Sabiha..." value={query} onChange={(e) => setQuery(e.target.value)} />
+        <Input className="h-12 pl-9" placeholder="Baku, GYD, Istanbul, IST..." value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
       {loading && <div className="rounded-xl border p-4 text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Searching live airport API...</div>}
       {!loading && results.length > 0 && (
@@ -115,14 +115,14 @@ function AirportSearchBox({
                 type="button"
                 key={airport.id}
                 onClick={() => setSelected(airport)}
-                className={`w-full text-left rounded-2xl border p-4 transition-colors ${active ? "border-primary bg-primary/10" : "bg-muted/20 hover:bg-muted/40"}`}
+                className={`w-full text-left rounded-2xl border p-4 transition-colors mobile-wrap ${active ? "border-primary bg-primary/10" : "bg-muted/20 hover:bg-muted/40"}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold text-foreground">{airportDisplay(airport)}</p>
                     <p className="text-sm text-muted-foreground mt-1">{airport.airport}</p>
                     <p className="text-sm text-muted-foreground">{airport.country || "Country not returned"} {airport.latitude && airport.longitude ? `• ${airport.latitude}, ${airport.longitude}` : ""}</p>
-                    <p className="text-xs text-muted-foreground mt-2">{airport.note || "Live airport result from API."}</p>
+                    <p className="hidden text-xs text-muted-foreground mt-2 sm:block">{airport.note || "Live airport result from API."}</p>
                   </div>
                   {active && <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />}
                 </div>
@@ -670,18 +670,18 @@ export default function PlannerPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2"><Sparkles className="h-7 w-7 text-primary" /> AI Trip Planner</h1>
-        <p className="text-muted-foreground mt-2 max-w-3xl">Generate a complete AI-planned trip using live APIs. Flights use SerpApi #3/#2/#1 or SearchApi when quota is available; Auto mode can also use Duffel sandbox test offers. Demo flight fallback is disabled.</p>
+        
       </div>
 
       <Card className="overflow-hidden">
-        <CardHeader className="cursor-pointer" onClick={() => setFiltersOpen(!filtersOpen)}>
+        <CardHeader className="cursor-pointer p-4 sm:p-6" onClick={() => setFiltersOpen(!filtersOpen)}>
           <div className="flex items-center justify-between gap-4">
-            <CardTitle className="flex items-center gap-2"><Menu className="h-5 w-5" /> Trip route, live airport search and filters</CardTitle>
+            <CardTitle className="flex min-w-0 items-center gap-2 text-lg leading-tight sm:text-xl"><Menu className="h-5 w-5 shrink-0" /> <span className="min-w-0">Trip route, airports and filters</span></CardTitle>
             <ChevronDown className={`h-5 w-5 transition-transform ${filtersOpen ? "rotate-180" : ""}`} />
           </div>
         </CardHeader>
         {filtersOpen && (
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-5 p-4 sm:space-y-6 sm:p-6">
             <div className="grid xl:grid-cols-2 gap-5">
               <AirportSearchBox title="Departure city and airport" query={departureQuery} setQuery={setDepartureQuery} selected={departureAirport} setSelected={setDepartureAirport} />
               <AirportSearchBox title="Destination city and airport" query={arrivalQuery} setQuery={setArrivalQuery} selected={arrivalAirport} setSelected={setArrivalAirport} />
@@ -689,8 +689,8 @@ export default function PlannerPage() {
 
             <div className="grid md:grid-cols-2 xl:grid-cols-6 gap-4">
               <div><Label>Ticket type</Label><Select value={form.tripType} onChange={(e: any) => setForm(prev => ({ ...prev, tripType: e.target.value, returnDate: e.target.value === "ONE_WAY" ? "" : prev.returnDate }))} className="mt-1 h-12"><option value="ROUND_TRIP">Round trip</option><option value="ONE_WAY">One way</option></Select></div>
-              <div><Label>Departure date</Label><Input type="date" value={form.departureDate} onChange={set("departureDate")} className="smart-date-input mt-1 h-12" /></div>
-              <div><Label>{form.tripType === "ROUND_TRIP" ? "Return date" : "Return date disabled"}</Label><Input type="date" value={form.returnDate} onChange={set("returnDate")} disabled={form.tripType === "ONE_WAY"} className="smart-date-input mt-1 h-12" /></div>
+              <div><Label>Departure date</Label><div className="smart-date-field relative mt-1"><Input type="date" value={form.departureDate} onChange={set("departureDate")} className="smart-date-input h-12" />{!form.departureDate ? <span className="pointer-events-none absolute inset-0 flex items-center px-4 text-muted-foreground">yyyy-mm-dd</span> : null}</div></div>
+              <div><Label>{form.tripType === "ROUND_TRIP" ? "Return date" : "Return date disabled"}</Label><div className="smart-date-field relative mt-1"><Input type="date" value={form.returnDate} onChange={set("returnDate")} disabled={form.tripType === "ONE_WAY"} className="smart-date-input h-12" />{!form.returnDate ? <span className="pointer-events-none absolute inset-0 flex items-center px-4 text-muted-foreground">yyyy-mm-dd</span> : null}</div></div>
               <div><Label>Travelers</Label><Input type="number" min="1" value={form.travelerCount} onChange={set("travelerCount")} className="mt-1 h-12" /></div>
               <div><Label>Currency</Label><Select value={form.currency} onChange={set("currency")} className="mt-1 h-12"><option>USD</option><option>EUR</option><option>TRY</option><option>AZN</option></Select></div>
               <div><Label>Flight cabin</Label><Select value={form.flightCabin} onChange={set("flightCabin")} className="mt-1 h-12"><option value="ECONOMY">Economy</option><option value="PREMIUM_ECONOMY">Premium Economy</option><option value="BUSINESS">Business</option><option value="FIRST">First Class</option></Select></div>
@@ -738,7 +738,7 @@ export default function PlannerPage() {
 
             <div className="rounded-2xl border p-4 space-y-4">
               <div className="flex items-center gap-2 font-semibold"><SlidersHorizontal className="h-4 w-4" /> AI budget planning controls</div>
-              <p className="text-xs text-muted-foreground">Leave these empty and SmartTravel will divide the money automatically using flights, hotel, trip length, travel style and traveler type. Fill any field only when you want to override that part.</p>
+              
               <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
                 <Input type="number" placeholder="Food override (optional)" value={form.foodBudget} onChange={set("foodBudget")} />
                 <Input type="number" placeholder="Shopping override (optional)" value={form.shoppingBudget} onChange={set("shoppingBudget")} />

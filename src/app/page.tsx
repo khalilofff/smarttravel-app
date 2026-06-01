@@ -16,10 +16,10 @@ import {
 } from "lucide-react";
 
 const liveFeatures = [
-  { title: "Live flights", text: "Searches real flight providers and keeps demo-only data out of normal planning.", icon: Plane },
-  { title: "Live hotels", text: "Hotel cards are built from connected hotel APIs for the selected city and dates.", icon: Hotel },
-  { title: "Real places", text: "Places, restaurants and attractions come from live location data instead of static examples.", icon: MapPin },
-  { title: "Weather aware", text: "Trip recommendations can account for live weather and travel timing.", icon: CloudSun },
+  { title: "Flights", text: "Search real flight providers, compare usable routes and keep selected flight data in the trip dashboard.", icon: Plane },
+  { title: "Hotels", text: "Show hotel options for the chosen destination and dates, then let the user pick the best stay.", icon: Hotel },
+  { title: "Places", text: "Suggest attractions, restaurants and activities for the exact city instead of showing generic examples.", icon: MapPin },
+  { title: "Weather", text: "Use weather context to make the itinerary more realistic for the selected travel dates.", icon: CloudSun },
 ];
 
 const workflow = [
@@ -30,9 +30,9 @@ const workflow = [
 ];
 
 const stats = [
-  { value: "7+", label: "planning categories" },
-  { value: "Live", label: "provider data" },
-  { value: "AI", label: "budget guidance" },
+  { value: "01", label: "choose route and dates" },
+  { value: "02", label: "compare flights and hotels" },
+  { value: "03", label: "save, review and export" },
 ];
 
 const securityCards = [
@@ -71,23 +71,23 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <section className="relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.02fr_0.98fr] lg:px-10 lg:pb-28 lg:pt-20">
+      <section className="relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.08fr_0.92fr] lg:px-10 lg:pb-28 lg:pt-20">
         <div className="min-w-0">
           <div className="mb-6 inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-sm text-slate-300 backdrop-blur">
             <Sparkles className="h-4 w-4 shrink-0 text-sky-300" />
             <span className="min-w-0 break-words">Live travel planning with safe sandbox actions</span>
           </div>
-          <h1 className="max-w-5xl text-4xl font-black tracking-[-0.045em] text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
-            Plan real trips with live data, AI and one clean dashboard.
+          <h1 className="max-w-5xl text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl md:text-6xl lg:text-7xl">
+            Plan a complete trip before you book anything.
           </h1>
           <p className="mt-7 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
-            SmartTravel explains the whole planning flow before users log in: routes, dates, cabin class, budget split, hotels, places, weather, events and provider links are combined into one editable trip dashboard.
+            SmartTravel helps a user choose departure and destination airports, travel dates, cabin class, traveler count and budget, then creates one clear dashboard with flight options, hotel options, places to visit, weather, events and budget guidance.
           </p>
-          <div className="mt-8 grid max-w-3xl gap-3 sm:grid-cols-3">
+          <div className="mt-8 grid max-w-4xl gap-3 sm:grid-cols-3">
             {stats.map((item) => (
               <div key={item.label} className="rounded-3xl border border-white/10 bg-white/[0.045] p-4">
                 <p className="text-3xl font-black text-white">{item.value}</p>
-                <p className="mt-1 text-sm text-slate-400">{item.label}</p>
+                <p className="mt-1 text-sm text-slate-300">{item.label}</p>
               </div>
             ))}
           </div>
