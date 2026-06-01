@@ -1088,3 +1088,63 @@ input[type="date"].smart-date-empty::-webkit-datetime-edit {
   max-width: 55%;
   max-height: 55%;
 }
+
+
+/* Final admin icon alignment fix: center icons inside every admin card/button box. */
+.admin-icon-box,
+.admin-action-icon,
+.admin-stat-icon,
+.admin-card-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  place-items: center !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+  vertical-align: middle !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.admin-icon-box {
+  width: 3rem !important;
+  height: 3rem !important;
+  min-width: 3rem !important;
+  min-height: 3rem !important;
+}
+
+.admin-action-icon {
+  width: 2rem !important;
+  height: 2rem !important;
+  min-width: 2rem !important;
+  min-height: 2rem !important;
+  border-radius: 0.75rem !important;
+}
+
+.admin-icon-box > svg,
+.admin-action-icon > svg,
+.admin-stat-icon > svg,
+.admin-card-icon > svg {
+  display: block !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  max-width: 1.25rem !important;
+  max-height: 1.25rem !important;
+  margin: auto !important;
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  flex: 0 0 auto !important;
+}
+
+.admin-card-row,
+.admin-stat-row {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.admin-feature-card .admin-icon-box,
+.admin-summary-card .admin-icon-box,
+.admin-system-card .admin-icon-box {
+  align-self: center !important;
+}

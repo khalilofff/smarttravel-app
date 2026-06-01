@@ -119,16 +119,20 @@ export default function AdminDashboardPage() {
       {/* Stats grid */}
       <div className={`grid gap-4 ${isSuperAdmin ? "grid-cols-2 xl:grid-cols-4" : "grid-cols-2 xl:grid-cols-5"}`}>
         {statsToShow.map(([label, value, sub, Icon]: any) => (
-          <Card key={label}><CardContent className="p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="mt-1 text-2xl font-bold">{value}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{sub}</p>
+          <Card key={label} className="admin-summary-card h-full">
+            <CardContent className="p-5 h-full flex items-center">
+              <div className="admin-stat-row flex w-full items-center justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                  <p className="mt-1 text-2xl font-bold">{value}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{sub}</p>
+                </div>
+                <div className="admin-icon-box rounded-xl bg-primary/10">
+                  <Icon className="text-primary" />
+                </div>
               </div>
-              <div className="admin-icon-box h-11 w-11 rounded-xl bg-primary/10"><Icon className="h-5 w-5 text-primary" /></div>
-            </div>
-          </CardContent></Card>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
@@ -136,13 +140,20 @@ export default function AdminDashboardPage() {
       <div className="grid lg:grid-cols-4 gap-4">
         {panels.map((p) => (
           <Link key={p.href} href={p.href}>
-            <Card className="h-full hover:border-primary/50 hover:bg-muted/20 transition-colors">
-              <CardContent className="p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="admin-icon-box h-11 w-11 rounded-xl bg-primary/10"><p.icon className="h-5 w-5 text-primary" /></div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <Card className="admin-feature-card h-full hover:border-primary/50 hover:bg-muted/20 transition-colors">
+              <CardContent className="p-5 h-full flex flex-col justify-between gap-4">
+                <div className="admin-card-row flex items-center justify-between gap-3">
+                  <div className="admin-icon-box rounded-xl bg-primary/10">
+                    <p.icon className="text-primary" />
+                  </div>
+                  <div className="admin-action-icon">
+                    <ArrowRight className="text-muted-foreground" />
+                  </div>
                 </div>
-                <div><h3 className="font-semibold">{p.title}</h3><p className="mt-1 text-xs text-muted-foreground leading-relaxed">{p.desc}</p></div>
+                <div>
+                  <h3 className="font-semibold">{p.title}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{p.desc}</p>
+                </div>
               </CardContent>
             </Card>
           </Link>

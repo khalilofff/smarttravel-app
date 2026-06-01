@@ -193,7 +193,7 @@ export default function AdminSystemPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="admin-icon-box h-12 w-12 rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+          <div className="admin-icon-box rounded-2xl border border-primary/20 bg-primary/10 text-primary">
             <Database className="h-6 w-6" />
           </div>
           <div>
