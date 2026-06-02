@@ -48,25 +48,64 @@ Button.displayName = "Button";
 
 // ─── INPUT ──────────────────────────────────────
 const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement> & { error?: string }>(
-  ({ className, type, error, value, placeholder, ...props }, ref) => {
+  ({ className, type, error, value, placeholder, onClick, onFocus, readOnly, ...props }, ref) => {
     const isDate = type === "date";
     const isEmptyDate = isDate && !value;
+    const innerRef = React.useRef<HTMLInputElement | null>(null);
+
+    const setRefs = (node: HTMLInputElement | null) => {
+      innerRef.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = node;
+    };
+
+    const openNativeDatePicker = () => {
+      if (!isDate || readOnly || props.disabled) return;
+      const input = innerRef.current as (HTMLInputElement & { showPicker?: () => void }) | null;
+      try {
+        input?.showPicker?.();
+      } catch {
+        // Some mobile browsers only allow showPicker from a direct user gesture.
+      }
+    };
+
     return (
       <div className="w-full">
-        <input
-          type={type}
-          value={value}
-          placeholder={isDate ? (placeholder || "yyyy-mm-dd") : placeholder}
-          className={cn(
-            "flex h-11 sm:h-10 w-full rounded-xl sm:rounded-lg border border-input bg-background px-3 py-2 text-base sm:text-sm text-foreground ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 transition-colors",
-            isDate && "date-input tabular-nums [color-scheme:light_dark] dark:[color-scheme:dark]",
-            isEmptyDate && "smart-date-empty",
-            error && "border-destructive focus-visible:ring-destructive",
-            className
+        <div className={cn(isDate && "relative smart-date-wrap")}>
+          <input
+            type={type}
+            value={value}
+            placeholder={isDate ? (placeholder || "dd/mm/yyyy") : placeholder}
+            readOnly={readOnly}
+            className={cn(
+              "flex h-11 sm:h-10 w-full rounded-xl sm:rounded-lg border border-input bg-background px-3 py-2 text-base sm:text-sm text-foreground ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 transition-colors",
+              isDate && "date-input smart-date-input tabular-nums [color-scheme:light_dark] dark:[color-scheme:dark]",
+              isEmptyDate && "smart-date-empty",
+              error && "border-destructive focus-visible:ring-destructive",
+              className
+            )}
+            ref={setRefs}
+            onClick={(event) => { onClick?.(event); openNativeDatePicker(); }}
+            onFocus={(event) => { onFocus?.(event); openNativeDatePicker(); }}
+            {...props}
+          />
+          {isDate && (
+            <button
+              type="button"
+              tabIndex={-1}
+              aria-hidden="true"
+              className="smart-date-trigger"
+              onClick={(event) => {
+                event.preventDefault();
+                innerRef.current?.focus();
+                openNativeDatePicker();
+              }}
+              disabled={props.disabled}
+            >
+              📅
+            </button>
           )}
-          ref={ref}
-          {...props}
-        />
+        </div>
         {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
       </div>
     );
