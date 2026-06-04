@@ -54,14 +54,38 @@ export async function POST(req: NextRequest) {
       notes: "Flight Search page: flight-only search; no trip is created.",
     };
 
-    const url = new URL("/api/smarttravel/plan", req.url);
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(planPayload),
-      cache: "no-store",
-    });
-    const data = await response.json().catch(() => ({}));
+    const localPort = process.env.PORT || "3000";
+    const internalPlanUrl = process.env.SMARTTRAVEL_INTERNAL_ORIGIN
+      ? new URL("/api/smarttravel/plan", process.env.SMARTTRAVEL_INTERNAL_ORIGIN)
+      : new URL(`/api/smarttravel/plan`, `http://127.0.0.1:${localPort}`);
+    const publicPlanUrl = new URL("/api/smarttravel/plan", req.url);
+
+    let response: Response | null = null;
+    let data: any = {};
+    let lastError = "";
+
+    for (const url of [internalPlanUrl, publicPlanUrl]) {
+      try {
+        response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(planPayload),
+          cache: "no-store",
+        });
+        data = await response.json().catch(() => ({}));
+        break;
+      } catch (error: any) {
+        lastError = error?.message || "fetch failed";
+      }
+    }
+
+    if (!response) {
+      return NextResponse.json(
+        { error: "Flight provider request failed. Make sure the Next.js app is running on localhost:3000 and try again.", detail: lastError },
+        { status: 502 },
+      );
+    }
+
     if (!response.ok) {
       return NextResponse.json({ error: data?.error || data?.detail || "Flight search failed.", diagnostics: data }, { status: response.status });
     }
