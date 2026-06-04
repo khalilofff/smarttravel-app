@@ -17,6 +17,7 @@ import { useLocalTabTheme } from "@/components/common/local-multi-session";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/flights", label: "Flight Search", icon: Search },
   { href: "/trips", label: "My Trips", icon: Plane },
   { href: "/planner", label: "AI Planner", icon: Sparkles },
   { href: "/destinations", label: "Explore", icon: Compass },
